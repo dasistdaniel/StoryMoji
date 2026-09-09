@@ -83,6 +83,19 @@ describe("app boot", () => {
     expect(after[2]).toBe(before[2]);
   });
 
+  it("only the redrawn card gets the deal animation class", async () => {
+    const app = await boot();
+    // first render: every card is freshly dealt
+    expect(app.querySelectorAll(".card--dealt")).toHaveLength(3);
+
+    app.querySelectorAll(".card__face")[1].click();
+
+    const dealt = [...app.querySelectorAll(".card")].map((c) =>
+      c.classList.contains("card--dealt")
+    );
+    expect(dealt).toEqual([false, true, false]);
+  });
+
   it("increasing the count keeps existing cards and adds new ones", async () => {
     const app = await boot();
     const before = [...app.querySelectorAll(".card__term")].map(

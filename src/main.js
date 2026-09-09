@@ -107,6 +107,12 @@ let t = createTranslator(store.get().language);
 /** Idea panel state, kept outside the store (transient UI only). */
 let currentPrompt = null;
 
+// render() rebuilds the whole tree, so to keep the "deal" animation from
+// replaying on every card, we remember what was on the table last time and only
+// animate the cards / idea panel that actually changed.
+let prevCardIds = [];
+let prevPromptId = null;
+
 function categoryLabel(id) {
   if (id === ALL_CATEGORIES) return t("controls.category.all");
   const cat = CATEGORY_BY_ID.get(id);
@@ -258,9 +264,16 @@ function buildCard(slot, index) {
     ]
   );
 
+  // Only newly dealt cards get the pop animation (see prevCardIds).
+  const dealt = card && prevCardIds[index] !== card.id;
+
   return el(
     "div",
-    { class: "card", style: `--accent:${accentFor(slot)}`, role: "listitem" },
+    {
+      class: "card" + (dealt ? " card--dealt" : ""),
+      style: `--accent:${accentFor(slot)}`,
+      role: "listitem",
+    },
     [select, face]
   );
 }
@@ -375,9 +388,14 @@ function buildIdeaPanel() {
   const { language, slots } = store.get();
   const hand = slots.map((slot) => slot.card).filter(Boolean);
   const text = renderPrompt(currentPrompt, language, hand);
+  const fresh = currentPrompt.id !== prevPromptId;
   return el(
     "div",
-    { class: "idea", role: "region", "aria-label": t("idea.title") },
+    {
+      class: "idea" + (fresh ? " idea--new" : ""),
+      role: "region",
+      "aria-label": t("idea.title"),
+    },
     [
       el("div", { class: "idea__inner" }, [
         el("span", { class: "idea__icon", "aria-hidden": "true" }, ["💡"]),
@@ -440,6 +458,10 @@ function render() {
     el("footer", { class: "footer" }, [t("footer.madeWith")]),
     liveRegion
   );
+
+  // Snapshot what we just drew so the next render only animates real changes.
+  prevCardIds = store.get().slots.map((slot) => slot.card?.id);
+  prevPromptId = currentPrompt?.id ?? null;
 }
 
 // Handle links opened / navigated to with a different draw in the hash

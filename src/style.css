@@ -157,6 +157,11 @@ body {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+/* Only a freshly dealt card animates – set by main.js, never on a plain
+   re-render (language switch, another card being tapped, …). */
+.card--dealt {
   animation: pop 0.28s ease both;
 }
 
@@ -257,6 +262,10 @@ body {
   background: var(--bg-2);
   border: 3px dashed var(--accent-brand);
   box-shadow: var(--shadow-sm);
+}
+
+/* Animate only when the idea itself changed, not on every re-render. */
+.idea--new {
   animation: pop 0.28s ease both;
 }
 

@@ -59,8 +59,10 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   - 1–2 Karten: eine Reihe
   - 3–4 Karten: 2 Spalten
   - 5–6 Karten: 3 Spalten (Desktop), 2 Spalten (Handy)
-- FR-4: Karten haben eine kurze Einblende-/Flip-Animation beim Ziehen
-  (per `prefers-reduced-motion` abschaltbar).
+- FR-4: Beim Ziehen animiert **nur die tatsächlich neu gezogene Karte** kurz
+  (Einblenden/„Pop"). Ein Re-Render aus anderem Grund (Sprachwechsel, andere
+  Karte antippen) löst keine Animation aus. Per `prefers-reduced-motion`
+  abschaltbar.
 
 ### 4.2 Anzahl der Karten
 
