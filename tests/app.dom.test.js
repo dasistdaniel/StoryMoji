@@ -4,6 +4,7 @@
 // and exercises the per-card category flow end to end.
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { decodeDraw, encodeDraw } from "../src/sharing.js";
 
 beforeEach(() => {
   vi.resetModules();
@@ -42,9 +43,13 @@ describe("app boot", () => {
     }
   });
 
-  it("writes the draw (with per-slot categories) into the URL hash", async () => {
+  it("writes an obfuscated draw into the URL hash", async () => {
     await boot();
-    expect(location.hash).toMatch(/^#draw=all,[a-z]+-[a-z0-9-]+,all,/);
+    expect(location.hash).toMatch(/^#d=[A-Za-z0-9_-]+$/);
+    const pairs = decodeDraw(location.hash);
+    expect(pairs).toHaveLength(3);
+    expect(pairs.every((p) => p.category === "all")).toBe(true);
+    expect(pairs.every((p) => /-/.test(p.id))).toBe(true);
   });
 
   it("changing a card's category redraws only that card into that category", async () => {
@@ -60,7 +65,7 @@ describe("app boot", () => {
     const selects = app.querySelectorAll("select.card__cat");
     expect(selects[1].value).toBe("animals");
     // hash now records animals for slot 2
-    expect(location.hash.split(",")[2]).toBe("animals");
+    expect(decodeDraw(location.hash)[1].category).toBe("animals");
 
     const after = [...app.querySelectorAll(".card__term")].map(
       (n) => n.textContent
@@ -115,7 +120,7 @@ describe("app boot", () => {
     expect(after.every((c) => c !== "all")).toBe(true);
     expect(new Set(after).size).toBe(3); // distinct
     // hash records the new categories
-    expect(location.hash.split(",")[0]).toBe("#draw=" + after[0]);
+    expect(decodeDraw(location.hash).map((p) => p.category)).toEqual(after);
   });
 
   it("increasing the count keeps existing cards and adds new ones", async () => {
@@ -134,20 +139,32 @@ describe("app boot", () => {
     expect(after.slice(0, 3)).toEqual(before);
   });
 
-  it("restores a shared draw from the URL hash", async () => {
+  it("restores a shared draw from the URL hash (legacy readable + obfuscated)", async () => {
+    const expectRestore = async () => {
+      const app = await boot();
+      const terms = [...app.querySelectorAll(".card__term")].map(
+        (n) => n.textContent
+      );
+      expect(terms).toEqual(["Fuchs", "Schlüssel", "Stern"]);
+      const selects = app.querySelectorAll("select.card__cat");
+      expect([...selects].map((s) => s.value)).toEqual([
+        "animals",
+        "all",
+        "nature",
+      ]);
+    };
+
     location.hash =
       "#draw=animals,animals-fox,all,objects-key,nature,nature-star";
-    const app = await boot();
-    const terms = [...app.querySelectorAll(".card__term")].map(
-      (n) => n.textContent
-    );
-    expect(terms).toEqual(["Fuchs", "Schlüssel", "Stern"]);
-    const selects = app.querySelectorAll("select.card__cat");
-    expect([...selects].map((s) => s.value)).toEqual([
-      "animals",
-      "all",
-      "nature",
+    await expectRestore();
+
+    // the obfuscated form the app actually produces
+    location.hash = encodeDraw([
+      { category: "animals", card: { id: "animals-fox" } },
+      { category: "all", card: { id: "objects-key" } },
+      { category: "nature", card: { id: "nature-star" } },
     ]);
+    await expectRestore();
   });
 
   it("switching language updates terms without changing the cards", async () => {

@@ -7,41 +7,42 @@ const slots = [
   { category: "nature", card: { id: "nature-star" } },
 ];
 
+const pairs = [
+  { category: "animals", id: "animals-fox" },
+  { category: "all", id: "objects-key" },
+  { category: "nature", id: "nature-star" },
+];
+
 describe("encodeDraw / decodeDraw", () => {
   it("round-trips slots into category/id pairs", () => {
-    const hash = encodeDraw(slots);
-    expect(decodeDraw(hash)).toEqual([
-      { category: "animals", id: "animals-fox" },
-      { category: "all", id: "objects-key" },
-      { category: "nature", id: "nature-star" },
-    ]);
+    expect(decodeDraw(encodeDraw(slots))).toEqual(pairs);
   });
 
-  it("produces a comma-separated alternating list", () => {
-    expect(encodeDraw(slots)).toBe(
-      "#draw=animals,animals-fox,all,objects-key,nature,nature-star"
-    );
+  it("produces an obfuscated #d= hash that does not contain the card ids", () => {
+    const hash = encodeDraw(slots);
+    expect(hash.startsWith("#d=")).toBe(true);
+    expect(hash).not.toContain("animals-fox");
+    expect(hash).not.toContain("nature");
   });
 
   it("skips slots without a card", () => {
     const withGap = [slots[0], { category: "food", card: null }, slots[2]];
-    expect(decodeDraw(encodeDraw(withGap))).toEqual([
-      { category: "animals", id: "animals-fox" },
-      { category: "nature", id: "nature-star" },
-    ]);
+    expect(decodeDraw(encodeDraw(withGap))).toEqual([pairs[0], pairs[2]]);
   });
 
-  it("returns null for unrelated hashes", () => {
+  it("still reads legacy readable #draw= links", () => {
+    expect(
+      decodeDraw("#draw=animals,animals-fox,all,objects-key,nature,nature-star")
+    ).toEqual(pairs);
+    expect(decodeDraw("draw=animals,animals-fox,all")).toEqual([pairs[0]]);
+  });
+
+  it("returns null for unrelated or malformed hashes", () => {
     expect(decodeDraw("")).toBeNull();
     expect(decodeDraw("#")).toBeNull();
     expect(decodeDraw("#section-2")).toBeNull();
+    expect(decodeDraw("#d=@@not base64@@")).toBeNull();
     expect(decodeDraw("#draw=lonely")).toBeNull();
-  });
-
-  it("tolerates a missing leading # and a trailing unpaired element", () => {
-    expect(decodeDraw("draw=animals,animals-fox,all")).toEqual([
-      { category: "animals", id: "animals-fox" },
-    ]);
   });
 
   it("survives odd characters via encodeURIComponent", () => {

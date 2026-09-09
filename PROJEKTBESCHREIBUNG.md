@@ -139,15 +139,20 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 ### 4.7 Teilbare Ziehung (v1)
 
 - FR-26: Die aktuelle Ziehung wird in den URL-Hash kodiert – pro Slot ein Paar
-  aus Kategorie und Karten-ID (`#draw=<kat>,<id>,<kat>,<id>,…`). Öffnet man
-  diesen Link, werden exakt dieselben Karten und Slot-Kategorien
-  wiederhergestellt (unabhängig von Sprache und lokalem Zustand).
+  aus Kategorie und Karten-ID. Öffnet man diesen Link, werden exakt dieselben
+  Karten und Slot-Kategorien wiederhergestellt (unabhängig von Sprache und
+  lokalem Zustand).
+- FR-26a: Der Hash ist **verschleiert** (`#d=<base64url>`), damit man an der
+  URL nicht direkt ablesen kann, welche Karten liegen. Das ist reine
+  Obfuskation, keine Sicherheit – der Base64-Inhalt ist von jedem dekodierbar.
+  Ältere lesbare Links (`#draw=<kat>,<id>,…`) werden beim Öffnen weiterhin
+  akzeptiert und sofort in die verschleierte Form umgeschrieben.
 - FR-27: Button "Ziehung teilen" kopiert den Link in die Zwischenablage
   (Fallback: Link zum Markieren anzeigen). Wo verfügbar, `navigator.share`.
 - FR-28: Der Hash wird bei jeder Änderung der Ziehung aktualisiert
   (`history.replaceState`, kein zusätzlicher History-Eintrag).
 - FR-29: Ungültige/veraltete Karten-IDs im Hash werden ignoriert, fehlende
-  Karten mit Zufallskarten aufgefüllt.
+  Karten mit Zufallskarten aufgefüllt; ein defekter Base64-Hash wird ignoriert.
 
 ### 4.8 Sound (v1)
 
@@ -205,9 +210,10 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - **Sound:** Kleine, selbst gehostete Audio-Dateien; Wiedergabe über eine
   gekapselte `sound.js` (Web Audio API oder `<audio>`), opt-in, in localStorage
   gemerkt.
-- **Teilen:** Ziehung wird im URL-Hash serialisiert – pro Slot ein Paar aus
-  Kategorie und Karten-ID; `sharing.js` kümmert sich um Lesen/Schreiben des Hash
-  und den Kopier-/Share-Button.
+- **Teilen:** Ziehung wird als `<kat>,<id>,…` serialisiert und base64url-kodiert
+  im URL-Hash abgelegt (`#d=…`, verschleiert – siehe FR-26a); `sharing.js`
+  kümmert sich um Kodieren/Dekodieren (inkl. Legacy-`#draw=`), Lesen/Schreiben
+  des Hash und den Kopier-/Share-Button.
 
 ### 6.2 Warum statisch reicht
 
@@ -276,9 +282,10 @@ state = {
 
 Persistiert in `localStorage` unter `emoji-cards:v1`: `language`, `soundEnabled`
 und `slotCategories` (nur die Kategorien, als Array). Die gezogenen Karten
-stehen ausschließlich im URL-Hash (pro Slot `<kategorie>,<karten-id>`), damit
-Ziehungen teilbar sind. Beim Laden gilt: Hash schlägt localStorage, localStorage
-schlägt Standardwerte (3 Slots × "Alle Kategorien").
+stehen ausschließlich im URL-Hash (pro Slot `<kategorie>,<karten-id>`, das Ganze
+base64url-kodiert als `#d=…`), damit Ziehungen teilbar, aber nicht direkt
+ablesbar sind. Beim Laden gilt: Hash schlägt localStorage, localStorage schlägt
+Standardwerte (3 Slots × "Alle Kategorien").
 
 ### 6.5 Kernfunktionen (Module)
 

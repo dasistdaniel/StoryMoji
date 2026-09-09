@@ -57,8 +57,10 @@ public/                 manifest + icons (copied verbatim into dist/)
 - **Each card has its own category picker.** A card is drawn from the category
   chosen on its own slot; "All categories" is the default.
 - The **current draw** – one `category,cardId` pair per slot – lives in
-  `location.hash`, so any draw is shareable via its URL. Language, the sound
-  toggle and the per-slot categories are stored in `localStorage`.
+  `location.hash`, base64url-encoded (`#d=…`) so a glance at the URL doesn't
+  reveal the cards (obfuscation, not security). Any draw is shareable via its
+  URL; legacy readable `#draw=` links still work. Language, the sound toggle and
+  the per-slot categories are stored in `localStorage`.
 - Tapping a card replaces just that card (from its slot's category). "Shuffle
   cards" redraws every card from its own slot category; "Shuffle categories"
   rolls a fresh random category for every slot and draws matching cards.

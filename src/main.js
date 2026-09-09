@@ -486,6 +486,8 @@ window.addEventListener("hashchange", () => {
   const pairs = readDrawFromUrl();
   if (!pairs || !pairs.length) return;
   store.set({ slots: slotsFromPairs(pairs) });
+  // Normalise a legacy readable link to the obfuscated form.
+  syncUrl();
 });
 
 // Every state change re-renders. Handlers that only touch transient UI state
