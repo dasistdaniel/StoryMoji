@@ -55,10 +55,16 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-1: Es werden zwischen 1 und 6 Karten gleichzeitig angezeigt.
 - FR-2: Jede Karte zeigt ein Emoji (groß) und den zugehörigen Begriff in der
   aktiven Sprache.
-- FR-3: Das Kartenraster ist responsiv:
-  - 1–2 Karten: eine Reihe
-  - 3–4 Karten: 2 Spalten
-  - 5–6 Karten: 3 Spalten (Desktop), 2 Spalten (Handy)
+- FR-3: Das Kartenraster ist responsiv und zentriert. Die Karten haben an
+  jeder Anzahl eine feste Maximalbreite (~165–230 px), damit sie nie
+  übergroß werden; nur die Spaltenzahl ändert sich:
+  - 1 Karte: einzeln
+  - 2 Karten: 2 nebeneinander
+  - 3 Karten: 3 (Desktop) bzw. 2 + 1 (Handy)
+  - 4 Karten: 4 in einer Reihe (Desktop) bzw. 2 × 2 (Handy)
+  - 5–6 Karten: 3 pro Reihe
+  - Emoji- und Textgröße skalieren mit der Kartenbreite (Container-Queries),
+    nicht mit dem Viewport.
 - FR-4: Beim Ziehen animiert **nur die tatsächlich neu gezogene Karte** kurz
   (Einblenden/„Pop"). Ein Re-Render aus anderem Grund (Sprachwechsel, andere
   Karte antippen) löst keine Animation aus. Per `prefers-reduced-motion`
