@@ -36,11 +36,15 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 
 ## 3. Nutzer und Kernszenario
 
-1. Nutzer öffnet die Seite. Es sind z. B. 3 Karten sichtbar, alle Kategorien gemischt.
-2. Nutzer stellt die Anzahl Karten auf 4 und wählt die Kategorie "Tiere".
-3. Nutzer tippt auf "Neu mischen" – alle 4 Karten werden neu und zufällig gezogen.
+1. Nutzer öffnet die Seite. Es sind z. B. 3 Karten sichtbar, jede aus "Alle
+   Kategorien".
+2. Nutzer stellt die Anzahl Karten auf 4 und wählt für die erste Karte die
+   Kategorie "Tiere", für die zweite "Fahrzeuge", die anderen bleiben gemischt.
+3. Nutzer tippt auf "Alle mischen" – jede Karte wird neu gezogen, jeweils aus
+   ihrer eigenen Kategorie.
 4. Eine Karte passt nicht in die Geschichte – Nutzer tippt auf genau diese Karte,
-   sie wird durch eine neue zufällige Karte (derselben Kategorie) ersetzt.
+   sie wird durch eine neue zufällige Karte (aus der Kategorie dieser Karte)
+   ersetzt.
 5. Nutzer tippt auf "Spielidee" und bekommt einen Vorschlag angezeigt.
 6. Kind erzählt die Geschichte.
 
@@ -65,27 +69,33 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Karten bleiben unverändert. Verringern entfernt Karten von rechts.
 - FR-7: Die zuletzt gewählte Anzahl wird lokal gespeichert (localStorage).
 
-### 4.3 Kategorien / Stapel
+### 4.3 Kategorien / Stapel (pro Karte)
 
-- FR-8: Eine Kategorieauswahl (Dropdown oder Chips) bestimmt, aus welchem Stapel
-  gezogen wird.
-- FR-9: Option "Alle Kategorien" (Standard) mischt alle Stapel zusammen.
-- FR-10: Beim Neu-Mischen oder Nachziehen bleibt die gewählte Kategorie erhalten.
+- FR-8: **Jede Kartenposition ("Slot") hat ihre eigene Kategorieauswahl** – ein
+  kleines Dropdown direkt an der Karte. Es bestimmt, aus welchem Stapel diese
+  eine Karte gezogen wird. Es gibt keine globale Kategorie mehr.
+- FR-9: Option "Alle Kategorien" (Standard für jeden neuen Slot) zieht für diesen
+  Slot aus allen Stapeln zusammen.
+- FR-10: Ändert man die Kategorie eines Slots, wird sofort eine passende neue
+  Karte für diesen Slot gezogen. Die anderen Karten bleiben unverändert.
+- FR-10a: Beim Nachziehen ("Alle mischen" oder Tap auf eine Karte) bleibt die
+  pro Slot gewählte Kategorie erhalten.
 - FR-11: Vorgeschlagene Kategorien (Startumfang):
   Tiere, Gegenstände, Natur, Essen, Menschen & Berufe, Orte, Fahrzeuge,
   Gefühle, Fantasie & Magie, Wetter & Himmel, Sport & Freizeit, Symbole.
-- FR-12: Die zuletzt gewählte Kategorie wird lokal gespeichert.
+- FR-12: Die pro Slot gewählten Kategorien werden lokal gespeichert (Array).
+  Neue Slots (Anzahl erhöhen) übernehmen die Kategorie des letzten Slots.
 
 ### 4.4 Ziehen und Mischen
 
 - FR-13: Klick/Tap auf eine einzelne Karte ersetzt nur diese durch eine neue
-  zufällige Karte (aus der aktiven Kategorie).
-- FR-14: Button "Alle mischen" zieht alle sichtbaren Karten neu.
-- FR-15: Ziehen ist ohne Zurücklegen innerhalb einer Ziehung: keine Karte
-  erscheint doppelt, solange die Kategorie genug Einträge hat.
-- FR-16: Hat eine Kategorie weniger Einträge als angeforderte Karten, werden
-  so viele wie möglich eindeutig gezogen, der Rest darf sich wiederholen
-  (mit dezentem Hinweis).
+  zufällige Karte aus der Kategorie **dieses Slots**.
+- FR-14: Button "Alle mischen" zieht jede Karte neu – jeweils aus der Kategorie
+  ihres Slots.
+- FR-15: Ziehen ist so weit wie möglich ohne Zurücklegen: keine Karte erscheint
+  doppelt, solange die beteiligten Kategorien genug Einträge haben.
+- FR-16: Reichen die Karten einer Kategorie nicht (z. B. mehrere Slots derselben
+  kleinen Kategorie), dürfen sich Karten wiederholen.
 - FR-17: Zufall über `crypto.getRandomValues` (Fisher-Yates-Shuffle).
 
 ### 4.5 Spielideen / Vorschläge
@@ -114,8 +124,9 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 
 ### 4.7 Teilbare Ziehung (v1)
 
-- FR-26: Die aktuelle Ziehung (Karten-IDs + Kategorie + Anzahl) wird in den
-  URL-Hash kodiert. Öffnet man diesen Link, wird exakt dieselbe Ziehung
+- FR-26: Die aktuelle Ziehung wird in den URL-Hash kodiert – pro Slot ein Paar
+  aus Kategorie und Karten-ID (`#draw=<kat>,<id>,<kat>,<id>,…`). Öffnet man
+  diesen Link, werden exakt dieselben Karten und Slot-Kategorien
   wiederhergestellt (unabhängig von Sprache und lokalem Zustand).
 - FR-27: Button "Ziehung teilen" kopiert den Link in die Zwischenablage
   (Fallback: Link zum Markieren anzeigen). Wo verfügbar, `navigator.share`.
@@ -179,9 +190,9 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - **Sound:** Kleine, selbst gehostete Audio-Dateien; Wiedergabe über eine
   gekapselte `sound.js` (Web Audio API oder `<audio>`), opt-in, in localStorage
   gemerkt.
-- **Teilen:** Ziehung wird im URL-Hash serialisiert (kompakte Kodierung der
-  Karten-IDs); `sharing.js` kümmert sich um Lesen/Schreiben des Hash und den
-  Kopier-/Share-Button.
+- **Teilen:** Ziehung wird im URL-Hash serialisiert – pro Slot ein Paar aus
+  Kategorie und Karten-ID; `sharing.js` kümmert sich um Lesen/Schreiben des Hash
+  und den Kopier-/Share-Button.
 
 ### 6.2 Warum statisch reicht
 
@@ -238,32 +249,38 @@ Zustand zwischen Nutzern, daher kein Server, keine DB.
 
 ```
 state = {
-  language: "de",       // localStorage
-  category: "all",      // localStorage
-  count: 3,             // localStorage
-  soundEnabled: false,  // localStorage
-  drawn: [cardId, ...]  // aktuelle Ziehung – localStorage + URL-Hash
+  language: "de",          // localStorage
+  soundEnabled: false,     // localStorage
+  slots: [                 // aktuelle Ziehung
+    { category: "animals", card: <Card> },   // je Slot: eigene Kategorie + Karte
+    { category: "all",     card: <Card> },
+    ...
+  ]
 }
 ```
 
-Einstellungen persistieren in `localStorage` unter `emoji-cards:v1`.
-Die aktuelle Ziehung (`drawn` + `category` + `count`) wird zusätzlich im
-URL-Hash serialisiert. Beim Laden gilt: Hash schlägt localStorage, localStorage
-schlägt Standardwerte.
+Persistiert in `localStorage` unter `emoji-cards:v1`: `language`, `soundEnabled`
+und `slotCategories` (nur die Kategorien, als Array). Die gezogenen Karten
+stehen ausschließlich im URL-Hash (pro Slot `<kategorie>,<karten-id>`), damit
+Ziehungen teilbar sind. Beim Laden gilt: Hash schlägt localStorage, localStorage
+schlägt Standardwerte (3 Slots × "Alle Kategorien").
 
 ### 6.5 Kernfunktionen (Module)
 
-- `store.js` – Zustand laden/speichern (localStorage), Subscribe.
-- `deck.js` – `drawCards(category, count, exclude)`, `redrawOne(index)`,
-  `shuffleAll()`; nutzt `crypto.getRandomValues` + Fisher-Yates.
-- `i18n.js` – `t(key)`, `setLanguage(lang)`, Platzhalter-Ersetzung.
-- `prompts.js` – `randomPrompt()`, füllt `{card}`-Platzhalter.
-- `sharing.js` – Ziehung ↔ URL-Hash serialisieren/parsen, "Teilen"-Button
-  (Clipboard + `navigator.share`).
-- `sound.js` – `play(name)`, `setEnabled(bool)`; lädt Assets nach erster
-  Interaktion, respektiert `soundEnabled`.
-- `ui/` – Rendering von Kartenraster, Steuerleiste, Ideen-Panel; enthält
-  `renderEmoji(emoji)` als einzige Emoji-Ausgabestelle (Twemoji-fähig).
+- `store.js` – generischer Zustand (merge/subscribe) mit optionalem
+  `persist(state)`-Serializer nach localStorage.
+- `deck.js` – reine Slot-Logik: `drawOne(cards, category, exclude)`,
+  `drawSlots(cards, categories)`, `redrawSlot(cards, slots, index)`,
+  `reshuffleSlots`, `resizeSlots`; nutzt `crypto.getRandomValues` + Fisher-Yates.
+- `i18n.js` – `createTranslator(lang)` → `t(key, params)`, `{token}`-Ersetzung.
+- `prompts.js` – `randomPrompt()`, füllt `{card}`-Platzhalter aus der Hand.
+- `sharing.js` – Slots ↔ URL-Hash serialisieren/parsen, "Teilen"-Button
+  (Clipboard + Fallback).
+- `sound.js` – `play(name)`, `setEnabled(bool)`; synthetisiert Töne per Web
+  Audio (keine Asset-Dateien), respektiert `soundEnabled`.
+- `ui/dom.js` – `el()`-Helfer + `renderEmoji(emoji)` als einzige
+  Emoji-Ausgabestelle (Twemoji-fähig).
+- `main.js` – verdrahtet alles, Store-getriebenes Re-Render, Hash-Restore.
 - `pwa/` – `manifest.webmanifest` + Icons in v1; Service Worker ab v1.1.
 
 ### 6.6 Projektstruktur (Vorschlag)
@@ -402,8 +419,9 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
 1. ✅ **M1 – Grundgerüst:** Projekt-Setup (Vite, Vanilla JS), Kartenraster,
    Zufallsziehung, Anzahl 1–6, "Alle mischen", Einzelkarte nachziehen.
    Native Emojis über `renderEmoji()`.
-2. ✅ **M2 – Kategorien:** Kategorieauswahl, "Alle Kategorien", Persistenz in
-   localStorage, Kategorie-Akzentfarben.
+2. ✅ **M2 – Kategorien:** Kategorieauswahl **pro Karte** (Dropdown an jeder
+   Karte), "Alle Kategorien", Persistenz der Slot-Kategorien in localStorage,
+   Kategorie-Akzentfarben.
 3. ✅ **M3 – Spielideen:** Ideen-Panel, Platzhalter-Ersetzung, "Nächste Idee".
 4. ✅ **M4 – i18n:** DE/EN-Umschalter, alle Texte lokalisiert,
    Browsersprache-Default.

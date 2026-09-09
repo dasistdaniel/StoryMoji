@@ -148,56 +148,76 @@ body {
   }
 }
 
-.grid__item {
-  display: flex;
-}
-
 .card {
   position: relative;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
   border: 3px solid var(--accent, var(--line));
   background: var(--bg-2);
   border-radius: var(--radius);
-  padding: clamp(0.8rem, 3vw, 1.4rem) 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  animation: pop 0.28s ease both;
+}
+
+/* Per-card category picker, sitting in a tinted strip at the top. */
+.card__cat {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid var(--accent, var(--line));
+  background: var(--accent, var(--line));
+  color: #1b1b1b;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: clamp(0.72rem, 2.6vw, 0.9rem);
+  padding: 0.5rem 1.6rem 0.5rem 0.7rem;
+  cursor: pointer;
+  /* down-chevron drawn with a gradient so no external asset is needed */
+  background-image:
+    linear-gradient(45deg, transparent 50%, #1b1b1b 50%),
+    linear-gradient(135deg, #1b1b1b 50%, transparent 50%);
+  background-position:
+    right 0.85rem center,
+    right 0.55rem center;
+  background-size:
+    0.3rem 0.3rem,
+    0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+.card__face {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  font-family: inherit;
+  min-height: 0;
+  padding: clamp(0.9rem, 3.5vw, 1.6rem) 0.75rem;
+  border: 0;
+  background: transparent;
   color: inherit;
+  font-family: inherit;
+  cursor: pointer;
   aspect-ratio: 3 / 4;
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
-  animation: pop 0.28s ease both;
 }
 
-.card::after {
-  /* accent wash at the top of the card */
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 40%;
-  border-radius: var(--radius) var(--radius) 0 0;
-  background: var(--accent, transparent);
-  opacity: 0.12;
-  pointer-events: none;
-}
-
-.card:hover {
+.card:has(.card__face:hover) {
   transform: translateY(-3px) rotate(-1deg);
   box-shadow: var(--shadow);
 }
 
-.card:active {
+.card:has(.card__face:active) {
   transform: translateY(0) scale(0.98);
 }
 
 .card .emoji {
-  font-size: clamp(2.6rem, 12vw, 4.2rem);
+  font-size: clamp(2.4rem, 11vw, 4rem);
   line-height: 1;
 }
 

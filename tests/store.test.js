@@ -1,13 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Minimal in-memory localStorage so the store can be tested in the node env.
+let backing;
 beforeEach(() => {
-  const map = new Map();
+  backing = new Map();
   vi.stubGlobal("localStorage", {
-    getItem: (k) => (map.has(k) ? map.get(k) : null),
-    setItem: (k, v) => map.set(k, String(v)),
-    removeItem: (k) => map.delete(k),
-    clear: () => map.clear(),
+    getItem: (k) => (backing.has(k) ? backing.get(k) : null),
+    setItem: (k, v) => backing.set(k, String(v)),
+    removeItem: (k) => backing.delete(k),
+    clear: () => backing.clear(),
   });
 });
 
@@ -17,47 +18,49 @@ const importFresh = async () => {
 };
 
 describe("createStore", () => {
-  it("applies defaults", async () => {
+  it("starts from the initial state", async () => {
     const { createStore } = await importFresh();
-    const store = createStore();
-    const state = store.get();
-    expect(state.language).toBe("de");
-    expect(state.category).toBe("all");
-    expect(state.count).toBe(3);
-    expect(state.soundEnabled).toBe(false);
-    expect(state.hand).toEqual([]);
+    const store = createStore({ a: 1, b: "x" });
+    expect(store.get()).toEqual({ a: 1, b: "x" });
   });
 
-  it("clamps the count on init and on set", async () => {
+  it("merges patches on set", async () => {
     const { createStore } = await importFresh();
-    const store = createStore({ count: 99 });
-    expect(store.get().count).toBe(6);
-    store.set({ count: -4 });
-    expect(store.get().count).toBe(1);
+    const store = createStore({ a: 1, b: 2 });
+    store.set({ b: 9 });
+    expect(store.get()).toEqual({ a: 1, b: 9 });
   });
 
-  it("persists only whitelisted settings", async () => {
+  it("persists only what the persist() function returns", async () => {
     const { createStore, loadSettings } = await importFresh();
-    const store = createStore();
-    store.set({ language: "en", hand: [{ id: "x" }] });
-    const saved = loadSettings();
-    expect(saved.language).toBe("en");
-    expect(saved.hand).toBeUndefined();
+    const store = createStore(
+      { language: "de", secret: 42, slots: [] },
+      { persist: (s) => ({ language: s.language }) }
+    );
+    store.set({ language: "en", secret: 7 });
+    expect(loadSettings()).toEqual({ language: "en" });
+  });
+
+  it("does not persist at all without a persist() function", async () => {
+    const { createStore, loadSettings } = await importFresh();
+    const store = createStore({ a: 1 });
+    store.set({ a: 2 });
+    expect(loadSettings()).toEqual({});
   });
 
   it("notifies subscribers and can unsubscribe", async () => {
     const { createStore } = await importFresh();
-    const store = createStore();
+    const store = createStore({ n: 0 });
     const seen = [];
-    const off = store.subscribe((s) => seen.push(s.count));
-    store.set({ count: 5 });
+    const off = store.subscribe((s) => seen.push(s.n));
+    store.set({ n: 1 });
     off();
-    store.set({ count: 2 });
-    expect(seen).toEqual([5]);
+    store.set({ n: 2 });
+    expect(seen).toEqual([1]);
   });
 
   it("survives corrupt storage", async () => {
-    localStorage.setItem("emoji-cards:v1", "{not json");
+    backing.set("emoji-cards:v1", "{not json");
     const { loadSettings } = await importFresh();
     expect(loadSettings()).toEqual({});
   });

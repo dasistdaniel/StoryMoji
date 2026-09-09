@@ -1,9 +1,11 @@
 // Emoji Cards – app entry point.
 //
 // Wires the pure logic modules (deck, i18n, prompts, sharing, sound) to the DOM.
-// The current hand of cards is mirrored into the URL hash so a link reproduces
-// the exact same draw; everything else (language, category, count, sound) is
-// persisted in localStorage via the store.
+//
+// Each card sits in a "slot" with its own category. The slots (their categories
+// and drawn cards) are mirrored into the URL hash so a link reproduces the exact
+// same draw; language, sound and the slot categories are also kept in
+// localStorage via the store.
 
 import "./style.css";
 import cardData from "./data/cards.json";
@@ -12,12 +14,12 @@ import {
   MIN_CARDS,
   MAX_CARDS,
   clampCount,
-  drawHand,
-  redrawCard,
-  additionalCards,
+  drawOne,
+  drawSlots,
+  redrawSlot,
+  reshuffleSlots,
+  resizeSlots,
   cardsByIds,
-  poolFor,
-  hasEnoughCards,
 } from "./deck.js";
 import { createStore, loadSettings } from "./store.js";
 import {
@@ -26,7 +28,6 @@ import {
   SUPPORTED_LANGUAGES,
 } from "./i18n.js";
 import { randomPrompt, renderPrompt } from "./prompts.js";
-
 import { readDrawFromUrl, writeDrawToUrl, copyCurrentLink } from "./sharing.js";
 import * as sound from "./sound.js";
 import { el, clear, renderEmoji } from "./ui/dom.js";
@@ -34,42 +35,71 @@ import { el, clear, renderEmoji } from "./ui/dom.js";
 const CARDS = cardData.cards;
 const CATEGORIES = cardData.categories;
 const CATEGORY_BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));
+const DEFAULT_SLOT_COUNT = 3;
 
-// --- initial state -----------------------------------------------------------
+/** Coerce a stored/URL category into a known id or the "all" sentinel. */
+function normalizeCategory(id) {
+  return CATEGORY_BY_ID.has(id) || id === ALL_CATEGORIES ? id : ALL_CATEGORIES;
+}
 
-const settings = loadSettings();
-const store = createStore({
-  ...settings,
-  language:
-    settings.language ||
-    resolveLanguage(
-      typeof navigator !== "undefined" ? navigator.languages : []
-    ),
-});
+/**
+ * Build slots from `[{ category, id }]` pairs (from the URL). Unknown card ids
+ * are replaced with a fresh draw from that slot's category.
+ * @param {{ category: string, id: string }[]} pairs
+ */
+function slotsFromPairs(pairs) {
+  const trimmed = pairs.slice(0, MAX_CARDS);
+  const found = cardsByIds(
+    CARDS,
+    trimmed.map((p) => p.id)
+  );
+  const used = new Set();
+  return trimmed.map((pair, i) => {
+    const category = normalizeCategory(pair.category);
+    let card = found[i];
+    if (!card) card = drawOne(CARDS, category, used);
+    if (card) used.add(card.id);
+    return { category, card };
+  });
+}
 
-// Restore a shared draw from the URL if present, otherwise draw a fresh hand.
-const shared = readDrawFromUrl();
-if (shared) {
-  const restored = cardsByIds(CARDS, shared.ids);
-  const category = CATEGORY_BY_ID.has(shared.category)
-    ? shared.category
-    : ALL_CATEGORIES;
-  const count = clampCount(restored.length || store.get().count);
-  const hand =
-    restored.length >= count
-      ? restored.slice(0, count)
-      : restored.concat(
-          additionalCards(CARDS, category, restored, count - restored.length)
-        );
-  store.set({ category, count, hand });
+// --- initial state ---------------------------------------------------------
+
+const saved = loadSettings();
+
+const store = createStore(
+  {
+    language:
+      saved.language ||
+      resolveLanguage(
+        typeof navigator !== "undefined" ? navigator.languages : []
+      ),
+    soundEnabled: Boolean(saved.soundEnabled),
+    slots: [],
+  },
+  {
+    persist: (s) => ({
+      language: s.language,
+      soundEnabled: s.soundEnabled,
+      slotCategories: s.slots.map((slot) => slot.category),
+    }),
+  }
+);
+
+const fromUrl = readDrawFromUrl();
+if (fromUrl && fromUrl.length) {
+  store.set({ slots: slotsFromPairs(fromUrl) });
 } else {
-  const { category, count } = store.get();
-  store.set({ hand: drawHand(CARDS, category, count) });
+  const savedCats =
+    Array.isArray(saved.slotCategories) && saved.slotCategories.length
+      ? saved.slotCategories.slice(0, MAX_CARDS)
+      : Array(DEFAULT_SLOT_COUNT).fill(ALL_CATEGORIES);
+  store.set({ slots: drawSlots(CARDS, savedCats.map(normalizeCategory)) });
 }
 
 sound.setEnabled(store.get().soundEnabled);
 
-// --- rendering --------------------------------------------------------------
+// --- rendering -----------------------------------------------------------
 
 const root = document.getElementById("app");
 let t = createTranslator(store.get().language);
@@ -83,58 +113,58 @@ function categoryLabel(id) {
   return cat ? cat.label[store.get().language] || cat.label.de : id;
 }
 
-function accentFor(card) {
-  return CATEGORY_BY_ID.get(card.category)?.color || "#888";
+function accentFor(slot) {
+  const catId = slot.card ? slot.card.category : slot.category;
+  return CATEGORY_BY_ID.get(catId)?.color || "var(--line)";
 }
 
 function syncUrl() {
-  const { category, hand } = store.get();
-  writeDrawToUrl({ category, hand });
+  writeDrawToUrl(store.get().slots);
 }
 
-/** Replace a single card at `index` in the hand. */
+/** Persist new slots, play a sound, update the shareable URL. */
+function commitSlots(slots, soundName) {
+  store.set({ slots });
+  if (soundName) sound.play(soundName);
+  syncUrl();
+}
+
+// --- event handlers ----------------------------------------------------
+
+/** Tap a card: redraw it from its own slot category. */
 function handleCardTap(index) {
-  const { category, hand } = store.get();
-  const next = hand.slice();
-  next[index] = redrawCard(CARDS, category, hand, index);
-  store.set({ hand: next });
-  sound.play("redraw");
-  syncUrl();
+  const { slots } = store.get();
+  const next = slots.slice();
+  next[index] = {
+    category: next[index].category,
+    card: redrawSlot(CARDS, slots, index),
+  };
+  commitSlots(next, "redraw");
 }
 
-/** Re-draw the whole hand. */
+/** Change one slot's category and draw a matching card for it. */
+function handleSlotCategory(index, value) {
+  const category = normalizeCategory(value);
+  const { slots } = store.get();
+  const next = slots.slice();
+  next[index] = { category, card: next[index].card };
+  next[index] = { category, card: redrawSlot(CARDS, next, index) };
+  commitSlots(next, "draw");
+}
+
+/** Redraw every card from its own slot category. */
 function handleShuffle() {
-  const { category, count } = store.get();
-  store.set({ hand: drawHand(CARDS, category, count) });
-  sound.play("shuffle");
-  syncUrl();
+  commitSlots(reshuffleSlots(CARDS, store.get().slots), "shuffle");
 }
 
-/** Change the number of cards, keeping the cards already on the table. */
+/** Change how many cards are on the table (existing slots are kept). */
 function handleCount(nextCount) {
   const clamped = clampCount(nextCount);
-  const { category, hand } = store.get();
-  let nextHand;
-  if (clamped <= hand.length) {
-    nextHand = hand.slice(0, clamped);
-  } else {
-    nextHand = hand.concat(
-      additionalCards(CARDS, category, hand, clamped - hand.length)
-    );
-  }
-  store.set({ count: clamped, hand: nextHand });
-  sound.play("draw");
-  syncUrl();
-}
-
-/** Change the active category and draw a fresh hand from it. */
-function handleCategory(nextCategory) {
-  const category = CATEGORY_BY_ID.has(nextCategory)
-    ? nextCategory
+  const { slots } = store.get();
+  const fallback = slots.length
+    ? slots[slots.length - 1].category
     : ALL_CATEGORIES;
-  store.set({ category, hand: drawHand(CARDS, category, store.get().count) });
-  sound.play("draw");
-  syncUrl();
+  commitSlots(resizeSlots(CARDS, slots, clamped, fallback), "draw");
 }
 
 function handleLanguage(nextLang) {
@@ -178,53 +208,76 @@ async function handleShare() {
   }, 2500);
 }
 
-// --- DOM builders ----------------------------------------------------------
+// --- DOM builders -----------------------------------------------------
 
-function buildCard(card, index) {
+/** <option> list for a category <select>, with `selected` preselected. */
+function categoryOptions(selected) {
   const lang = store.get().language;
-  const term = card.term[lang] || card.term.de;
-  return el(
+  return [
+    el("option", { value: ALL_CATEGORIES }, [t("controls.category.all")]),
+    ...CATEGORIES.map((cat) =>
+      el("option", { value: cat.id }, [cat.label[lang] || cat.label.de])
+    ),
+  ].map((opt) => {
+    if (opt.value === selected) opt.selected = true;
+    return opt;
+  });
+}
+
+function buildCard(slot, index) {
+  const lang = store.get().language;
+  const card = slot.card;
+  const term = card ? card.term[lang] || card.term.de : "…";
+
+  const select = el(
+    "select",
+    {
+      class: "card__cat",
+      "aria-label": t("card.category.aria", { n: String(index + 1) }),
+      onChange: (e) => handleSlotCategory(index, e.target.value),
+    },
+    categoryOptions(slot.category)
+  );
+  select.value = slot.category;
+
+  const face = el(
     "button",
     {
-      class: "card",
+      class: "card__face",
       type: "button",
-      style: `--accent:${accentFor(card)}`,
       "aria-label": t("card.aria", {
         term,
-        category: categoryLabel(card.category),
+        category: categoryLabel(card ? card.category : slot.category),
       }),
       title: t("card.redraw", { term }),
       onClick: () => handleCardTap(index),
     },
-    [renderEmoji(card.emoji), el("span", { class: "card__term" }, [term])]
+    [
+      renderEmoji(card ? card.emoji : "❓"),
+      el("span", { class: "card__term" }, [term]),
+    ]
+  );
+
+  return el(
+    "div",
+    { class: "card", style: `--accent:${accentFor(slot)}`, role: "listitem" },
+    [select, face]
   );
 }
 
 function buildGrid() {
-  const { hand, count, category } = store.get();
+  const { slots } = store.get();
   const grid = el("div", {
     class: "grid",
-    dataset: { count: String(count) },
+    dataset: { count: String(slots.length) },
     role: "list",
   });
-  hand.forEach((card, i) => {
-    const item = el("div", { class: "grid__item", role: "listitem" }, [
-      buildCard(card, i),
-    ]);
-    grid.append(item);
-  });
-
-  const nodes = [grid];
-  if (!hasEnoughCards(poolFor(CARDS, category), count)) {
-    nodes.push(
-      el("p", { class: "notice", role: "note" }, [t("notice.fewCards")])
-    );
-  }
-  return nodes;
+  slots.forEach((slot, i) => grid.append(buildCard(slot, i)));
+  return grid;
 }
 
 function buildCountControl() {
-  const { count } = store.get();
+  const count = store.get().slots.length;
   const buttons = [];
   for (let n = MIN_CARDS; n <= MAX_CARDS; n++) {
     buttons.push(
@@ -241,54 +294,23 @@ function buildCountControl() {
       )
     );
   }
-  return el("div", { class: "control" }, [
-    el("span", { class: "control__label" }, [t("controls.count.label")]),
-    el("div", { class: "chips" }, buttons),
-  ]);
-}
-
-function buildCategoryControl() {
-  const { category } = store.get();
-  const options = [
-    el("option", { value: ALL_CATEGORIES }, [t("controls.category.all")]),
-    ...CATEGORIES.map((cat) =>
-      el("option", { value: cat.id }, [
-        cat.label[store.get().language] || cat.label.de,
-      ])
-    ),
-  ];
-  const select = el(
-    "select",
-    {
-      class: "select",
-      value: category,
-      "aria-label": t("controls.category.label"),
-      onChange: (e) => handleCategory(e.target.value),
-    },
-    options
-  );
-  select.value = category;
-  return el("div", { class: "control" }, [
-    el("span", { class: "control__label" }, [t("controls.category.label")]),
-    select,
+  return el("section", { class: "controls" }, [
+    el("div", { class: "control" }, [
+      el("span", { class: "control__label" }, [t("controls.count.label")]),
+      el("div", { class: "chips" }, buttons),
+    ]),
   ]);
 }
 
 function buildActions() {
   const shareBtn = el(
     "button",
-    {
-      class: "btn",
-      type: "button",
-      onClick: () => handleShare(),
-    },
+    { class: "btn", type: "button", onClick: () => handleShare() },
     ["🔗 ", t("controls.share")]
   );
-  // Show the "copied" confirmation inline on the button when present.
-  const feedback = shareBtnFeedback;
-  if (feedback) {
+  if (shareBtnFeedback) {
     clear(shareBtn);
-    shareBtn.append("✅ ", feedback);
+    shareBtn.append("✅ ", shareBtnFeedback);
   }
 
   return el("div", { class: "actions" }, [
@@ -350,7 +372,8 @@ function buildTopBar() {
 
 function buildIdeaPanel() {
   if (!currentPrompt) return null;
-  const { language, hand } = store.get();
+  const { language, slots } = store.get();
+  const hand = slots.map((slot) => slot.card).filter(Boolean);
   const text = renderPrompt(currentPrompt, language, hand);
   return el(
     "div",
@@ -384,7 +407,7 @@ function buildIdeaPanel() {
   );
 }
 
-// --- announcements (screen readers) ---------------------------------------
+// --- announcements (screen readers) --------------------------------
 
 let liveRegion;
 function announce(message) {
@@ -395,7 +418,7 @@ function announce(message) {
   }, 30);
 }
 
-// --- top-level render -----------------------------------------------------
+// --- top-level render ---------------------------------------------
 
 function render() {
   clear(root);
@@ -411,11 +434,8 @@ function render() {
   root.append(
     buildTopBar(),
     el("p", { class: "tagline" }, [t("app.tagline")]),
-    el("main", { class: "stage" }, [...buildGrid(), buildIdeaPanel()]),
-    el("section", { class: "controls" }, [
-      buildCountControl(),
-      buildCategoryControl(),
-    ]),
+    el("main", { class: "stage" }, [buildGrid(), buildIdeaPanel()]),
+    buildCountControl(),
     buildActions(),
     el("footer", { class: "footer" }, [t("footer.madeWith")]),
     liveRegion
@@ -425,17 +445,9 @@ function render() {
 // Handle links opened / navigated to with a different draw in the hash
 // (e.g. the browser back button after a share).
 window.addEventListener("hashchange", () => {
-  const next = readDrawFromUrl();
-  if (!next) return;
-  const restored = cardsByIds(CARDS, next.ids);
-  if (restored.length === 0) return;
-  store.set({
-    category: CATEGORY_BY_ID.has(next.category)
-      ? next.category
-      : ALL_CATEGORIES,
-    count: clampCount(restored.length),
-    hand: restored,
-  });
+  const pairs = readDrawFromUrl();
+  if (!pairs || !pairs.length) return;
+  store.set({ slots: slotsFromPairs(pairs) });
 });
 
 // Every state change re-renders. Handlers that only touch transient UI state

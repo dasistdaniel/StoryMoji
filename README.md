@@ -36,8 +36,8 @@ src/
   main.js               wires everything to the DOM
   style.css             all styles (light + dark, reduced-motion aware)
   rng.js                crypto-backed random helpers
-  deck.js               pure card-drawing logic
-  store.js              state + localStorage persistence
+  deck.js               pure per-slot card-drawing logic
+  store.js              generic state + localStorage persistence
   i18n.js               tiny translator, {token} interpolation
   prompts.js            play-idea prompts with {card} placeholders
   sharing.js            draw <-> URL hash, copy link
@@ -54,12 +54,15 @@ public/                 manifest + icons (copied verbatim into dist/)
 
 ## How it works
 
-- The **current draw** (category + ordered card ids) lives in `location.hash`,
-  so any draw is shareable via its URL. Language, category, count and the sound
-  toggle are stored in `localStorage`.
-- Tapping a card replaces just that card; "Shuffle all" redraws the whole hand.
+- **Each card has its own category picker.** A card is drawn from the category
+  chosen on its own slot; "All categories" is the default.
+- The **current draw** – one `category,cardId` pair per slot – lives in
+  `location.hash`, so any draw is shareable via its URL. Language, the sound
+  toggle and the per-slot categories are stored in `localStorage`.
+- Tapping a card replaces just that card (from its slot's category); "Shuffle
+  all" redraws every card from its own slot category.
 - Increasing the card count keeps the cards already on the table and only adds
-  new ones.
+  new slots (which inherit the last slot's category).
 - All randomness goes through `crypto.getRandomValues` (Fisher–Yates shuffle).
 
 ## Content

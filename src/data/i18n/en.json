@@ -4,7 +4,6 @@
 
   "controls.count.label": "Number of cards",
   "controls.count.set": "Show {n} cards",
-  "controls.category.label": "Category",
   "controls.category.all": "All categories",
   "controls.shuffle": "Shuffle all",
   "controls.idea": "Play idea",
@@ -16,6 +15,7 @@
 
   "card.redraw": "New card for {term}",
   "card.aria": "{term}, category {category}. Tap for a new card.",
+  "card.category.aria": "Category for card {n}",
 
   "idea.title": "Play idea",
   "idea.close": "Close",

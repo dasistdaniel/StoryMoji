@@ -1,27 +1,17 @@
 // Application state with a tiny pub/sub and localStorage persistence.
 //
-// Persisted settings: language, category, count, soundEnabled.
-// Not persisted here: the current hand of cards – that lives in the URL hash
-// (see sharing.js) so draws are shareable, and main.js keeps the two in sync.
-
-import { clampCount, ALL_CATEGORIES } from "./deck.js";
+// The store itself is generic: it holds a state object, notifies subscribers on
+// change, and – if given a `persist` function – writes that function's result to
+// localStorage after every change. main.js decides what is worth persisting
+// (language, sound, the per-slot categories); the drawn cards live in the URL
+// hash instead so draws are shareable (see sharing.js).
 
 const STORAGE_KEY = "emoji-cards:v1";
-const PERSISTED_KEYS = ["language", "category", "count", "soundEnabled"];
 
 /**
- * @typedef {Object} State
- * @property {string} language
- * @property {string} category
- * @property {number} count
- * @property {boolean} soundEnabled
- * @property {import("./deck.js").Card[]} hand
- */
-
-/**
- * Read persisted settings from localStorage. Always returns an object; missing
+ * Read the persisted blob from localStorage. Always returns an object; missing
  * or corrupt storage yields `{}`.
- * @returns {Partial<State>}
+ * @returns {Record<string, unknown>}
  */
 export function loadSettings() {
   try {
@@ -34,11 +24,9 @@ export function loadSettings() {
   }
 }
 
-function saveSettings(state) {
+function saveSettings(blob) {
   try {
-    const subset = {};
-    for (const key of PERSISTED_KEYS) subset[key] = state[key];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(subset));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(blob));
   } catch {
     // Private mode / storage disabled – the app still works for this session.
   }
@@ -46,19 +34,13 @@ function saveSettings(state) {
 
 /**
  * Create the store.
- * @param {Partial<State>} initial
+ * @template {object} S
+ * @param {S} initial initial state
+ * @param {{ persist?: (state: S) => Record<string, unknown> }} [options]
  */
-export function createStore(initial = {}) {
-  /** @type {State} */
-  const state = {
-    language: initial.language || "de",
-    category: initial.category || ALL_CATEGORIES,
-    count: clampCount(initial.count ?? 3),
-    soundEnabled: Boolean(initial.soundEnabled),
-    hand: initial.hand || [],
-  };
-
-  /** @type {Set<(state: State) => void>} */
+export function createStore(initial, { persist } = {}) {
+  const state = { ...initial };
+  /** @type {Set<(state: S) => void>} */
   const listeners = new Set();
 
   function emit() {
@@ -66,25 +48,24 @@ export function createStore(initial = {}) {
   }
 
   return {
-    /** @returns {Readonly<State>} */
+    /** @returns {Readonly<S>} */
     get() {
       return state;
     },
 
     /**
-     * Merge `patch` into the state, persist settings, notify listeners.
-     * @param {Partial<State>} patch
+     * Merge `patch` into the state, persist, notify listeners.
+     * @param {Partial<S>} patch
      */
     set(patch) {
       Object.assign(state, patch);
-      if ("count" in patch) state.count = clampCount(state.count);
-      saveSettings(state);
+      if (persist) saveSettings(persist(state));
       emit();
     },
 
     /**
      * Subscribe to state changes. Returns an unsubscribe function.
-     * @param {(state: State) => void} listener
+     * @param {(state: S) => void} listener
      */
     subscribe(listener) {
       listeners.add(listener);

@@ -2,16 +2,17 @@ import { describe, it, expect } from "vitest";
 import {
   poolFor,
   clampCount,
-  pickCards,
   hasEnoughCards,
-  drawHand,
-  redrawCard,
-  additionalCards,
+  drawOne,
+  drawSlots,
+  redrawSlot,
+  reshuffleSlots,
+  resizeSlots,
   cardsByIds,
   ALL_CATEGORIES,
 } from "../src/deck.js";
 
-/** Build a simple test deck: `count` cards spread over the given categories. */
+/** Build a simple test deck: `n` cards per category in `spec`. */
 function makeCards(spec) {
   const cards = [];
   for (const [category, n] of Object.entries(spec)) {
@@ -44,42 +45,9 @@ describe("poolFor", () => {
     expect(poolFor(cards, ALL_CATEGORIES)).toHaveLength(5);
   });
 
-  it("filters by category", () => {
+  it("filters by category and returns a copy", () => {
     expect(poolFor(cards, "food")).toHaveLength(2);
-  });
-
-  it("returns a copy, not the original array", () => {
-    const pool = poolFor(cards, ALL_CATEGORIES);
-    expect(pool).not.toBe(cards);
-  });
-});
-
-describe("pickCards", () => {
-  it("draws the requested number of unique cards when the pool is large", () => {
-    const pool = makeCards({ animals: 20 }).filter(
-      (c) => c.category === "animals"
-    );
-    const hand = pickCards(pool, 6);
-    expect(hand).toHaveLength(6);
-    expect(new Set(hand.map((c) => c.id)).size).toBe(6);
-  });
-
-  it("fills remaining slots with repeats when the pool is too small", () => {
-    const pool = makeCards({ tiny: 2 }).filter((c) => c.category === "tiny");
-    const hand = pickCards(pool, 5);
-    expect(hand).toHaveLength(5);
-    // only 2 distinct cards exist
-    expect(new Set(hand.map((c) => c.id)).size).toBe(2);
-  });
-
-  it("returns an empty array for an empty pool", () => {
-    expect(pickCards([], 3)).toEqual([]);
-  });
-
-  it("is deterministic given a fixed rng", () => {
-    const pool = makeCards({ a: 5 }).filter((c) => c.category === "a");
-    const rng = () => 0; // always picks the same swaps
-    expect(pickCards(pool, 3, rng)).toEqual(pickCards(pool, 3, rng));
+    expect(poolFor(cards, ALL_CATEGORIES)).not.toBe(cards);
   });
 });
 
@@ -91,57 +59,126 @@ describe("hasEnoughCards", () => {
   });
 });
 
-describe("drawHand", () => {
+describe("drawOne", () => {
   const cards = makeCards({ animals: 10, food: 10 });
 
   it("respects the category", () => {
-    const hand = drawHand(cards, "food", 4);
-    expect(hand.every((c) => c.category === "food")).toBe(true);
+    for (let i = 0; i < 20; i++) {
+      expect(drawOne(cards, "food").category).toBe("food");
+    }
   });
 
-  it("clamps the count", () => {
-    expect(drawHand(cards, ALL_CATEGORIES, 99)).toHaveLength(6);
+  it("avoids excluded ids when it can", () => {
+    const exclude = cards
+      .filter((c) => c.category === "animals")
+      .slice(0, 9)
+      .map((c) => c.id);
+    // only animals-9 is left un-excluded
+    expect(drawOne(cards, "animals", exclude).id).toBe("animals-9");
+  });
+
+  it("falls back to any card when everything is excluded", () => {
+    const pool = makeCards({ mini: 2 }).filter((c) => c.category === "mini");
+    const got = drawOne(pool, "mini", ["mini-0", "mini-1"]);
+    expect(["mini-0", "mini-1"]).toContain(got.id);
+  });
+
+  it("returns null when the category has no cards", () => {
+    expect(drawOne(cards, "category-with-no-cards")).toBeNull();
+    expect(drawOne([], ALL_CATEGORIES)).toBeNull();
   });
 });
 
-describe("redrawCard", () => {
-  const cards = makeCards({ animals: 10 });
+describe("drawSlots", () => {
+  const cards = makeCards({ animals: 10, food: 10 });
 
-  it("returns a card that is not already in the hand", () => {
-    const hand = pickCards(cards, 4, () => 0.5);
-    const replacement = redrawCard(cards, ALL_CATEGORIES, hand, 1);
-    expect(hand.map((c) => c.id)).not.toContain(replacement.id);
+  it("draws one card per category, matching each category", () => {
+    const slots = drawSlots(cards, ["animals", "food", "animals"]);
+    expect(slots).toHaveLength(3);
+    expect(slots[0].card.category).toBe("animals");
+    expect(slots[1].card.category).toBe("food");
+    expect(slots[2].card.category).toBe("animals");
   });
 
-  it("falls back to any card when the whole pool is on the table", () => {
-    const pool = makeCards({ mini: 3 }).filter((c) => c.category === "mini");
-    const hand = [...pool];
-    const replacement = redrawCard(pool, "mini", hand, 0);
-    expect(pool.map((c) => c.id)).toContain(replacement.id);
+  it("keeps cards distinct across slots when pools allow", () => {
+    const slots = drawSlots(cards, Array(6).fill("animals"));
+    expect(new Set(slots.map((s) => s.card.id)).size).toBe(6);
+  });
+
+  it("allows repeats only when a pool is too small", () => {
+    const small = makeCards({ tiny: 2 });
+    const slots = drawSlots(small, Array(4).fill("tiny"));
+    expect(new Set(slots.map((s) => s.card.id)).size).toBe(2);
   });
 });
 
-describe("additionalCards", () => {
+describe("redrawSlot", () => {
   const cards = makeCards({ animals: 10 });
 
-  it("returns fresh cards not already in the hand", () => {
-    const hand = pickCards(cards, 3, () => 0.3);
-    const extra = additionalCards(cards, ALL_CATEGORIES, hand, 2);
-    expect(extra).toHaveLength(2);
-    const handIds = new Set(hand.map((c) => c.id));
-    expect(extra.every((c) => !handIds.has(c.id))).toBe(true);
+  it("keeps the slot category and avoids the other slots' cards", () => {
+    const slots = drawSlots(cards, Array(4).fill("animals"));
+    const replacement = redrawSlot(cards, slots, 1);
+    const others = slots.filter((_, i) => i !== 1).map((s) => s.card.id);
+    expect(others).not.toContain(replacement.id);
   });
 
-  it("returns an empty array when asked for nothing", () => {
-    expect(additionalCards(cards, ALL_CATEGORIES, [], 0)).toEqual([]);
+  it("uses the slot's own category, not a neighbour's", () => {
+    const mixed = makeCards({ animals: 10, food: 10 });
+    const slots = drawSlots(mixed, ["food", "animals"]);
+    for (let i = 0; i < 10; i++) {
+      expect(redrawSlot(mixed, slots, 0).category).toBe("food");
+    }
+  });
+});
+
+describe("reshuffleSlots", () => {
+  it("redraws every slot from its own category", () => {
+    const cards = makeCards({ animals: 10, food: 10 });
+    const slots = drawSlots(cards, ["animals", "food", "food"]);
+    const next = reshuffleSlots(cards, slots);
+    expect(next.map((s) => s.category)).toEqual(["animals", "food", "food"]);
+    expect(next[0].card.category).toBe("animals");
+    expect(next[1].card.category).toBe("food");
+  });
+});
+
+describe("resizeSlots", () => {
+  const cards = makeCards({ animals: 20 });
+
+  it("shrinks by dropping slots from the end", () => {
+    const slots = drawSlots(cards, Array(5).fill("animals"));
+    const smaller = resizeSlots(cards, slots, 2, ALL_CATEGORIES);
+    expect(smaller).toHaveLength(2);
+    expect(smaller).toEqual(slots.slice(0, 2));
+  });
+
+  it("grows by adding slots with the fallback category, keeping the rest", () => {
+    const slots = drawSlots(cards, ["animals", "animals"]);
+    const bigger = resizeSlots(cards, slots, 4, ALL_CATEGORIES);
+    expect(bigger).toHaveLength(4);
+    expect(bigger.slice(0, 2)).toEqual(slots);
+    expect(bigger[2].category).toBe(ALL_CATEGORIES);
+    expect(bigger[3].category).toBe(ALL_CATEGORIES);
+    // new cards should differ from the ones already down
+    const ids = bigger.map((s) => s.card.id);
+    expect(new Set(ids).size).toBe(4);
+  });
+
+  it("is a no-op when the count is unchanged", () => {
+    const slots = drawSlots(cards, Array(3).fill("animals"));
+    expect(resizeSlots(cards, slots, 3, ALL_CATEGORIES)).toEqual(slots);
   });
 });
 
 describe("cardsByIds", () => {
   const cards = makeCards({ animals: 5 });
 
-  it("preserves order and drops unknown ids", () => {
+  it("preserves order and marks unknown ids as null", () => {
     const result = cardsByIds(cards, ["animals-3", "nope", "animals-1"]);
-    expect(result.map((c) => c.id)).toEqual(["animals-3", "animals-1"]);
+    expect(result.map((c) => (c ? c.id : null))).toEqual([
+      "animals-3",
+      null,
+      "animals-1",
+    ]);
   });
 });
