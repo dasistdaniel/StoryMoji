@@ -56,16 +56,16 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-1: Es werden zwischen 1 und 6 Karten gleichzeitig angezeigt.
 - FR-2: Jede Karte zeigt ein Emoji (groß) und den zugehörigen Begriff in der
   aktiven Sprache.
-- FR-3: Das Kartenraster ist responsiv und zentriert. **Jede Karte hat an
-  jeder Anzahl und Bildschirmbreite dasselbe Seitenverhältnis (5 : 6.4).**
-  Die Spalten sind Bruchteil-Spuren (`1fr`) mit einer Grid-Maximalbreite, sodass
-  Karten nie übergroß werden (Breite ~164–230 px) und nie überlaufen. Nur die
-  Spaltenzahl ändert sich:
-  - 1 Karte: einzeln (bis 230 px)
-  - 2 Karten: 2 nebeneinander
-  - 3 Karten: 3 (ab 680 px) bzw. 2 + 1 (Handy)
-  - 4 Karten: 4 in einer Reihe (ab 900 px) bzw. 2 × 2
-  - 5–6 Karten: 3 pro Reihe (ab 680 px) bzw. 2 pro Reihe
+- FR-3: **Kartenraster, Anzahl-Steuerung und Aktionsbuttons teilen sich eine
+  gemeinsame, zentrierte Spalte (max. 700 px)**, damit alles bündig
+  übereinander steht. Die Grid-Spalten sind `1fr`-Spuren (kein Überlauf möglich).
+  **Jede Karte hat an jeder Anzahl und Bildschirmbreite dasselbe
+  Seitenverhältnis (5 : 6.4)**; nur die Spaltenzahl ändert sich:
+  - 1 Karte: einzeln (bis 240 px), im Raster zentriert
+  - 2 Karten: 2 nebeneinander (Raster bis 460 px)
+  - 3 Karten: 3 (ab 620 px) bzw. 2 + 1 (Handy)
+  - 4 Karten: 4 in einer Reihe (ab 760 px) bzw. 2 × 2
+  - 5–6 Karten: 3 pro Reihe (ab 620 px) bzw. 2 pro Reihe
   - Emoji- und Textgröße skalieren mit der Kartenbreite (Container-Queries),
     nicht mit dem Viewport; lange Begriffe brechen mit Silbentrennung um.
 - FR-4: Beim Ziehen animiert **nur die tatsächlich neu gezogene Karte** kurz

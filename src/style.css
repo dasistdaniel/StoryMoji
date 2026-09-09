@@ -115,7 +115,17 @@ body {
   font-weight: 600;
 }
 
-/* --- card grid ----------------------------------------------------------- */
+/* --- play area ----------------------------------------------------------- */
+
+/* The card area, the count control and the action buttons share ONE centred
+   column width so they line up as a single stack. */
+.stage,
+.controls,
+.actions {
+  width: 100%;
+  max-width: 700px;
+  margin-inline: auto;
+}
 
 .stage {
   display: flex;
@@ -130,28 +140,28 @@ body {
    query, not the viewport. */
 .grid {
   /* `--cols` fraction tracks always sum to the grid width, so they can never
-     overflow; `max-width` then caps the grid at cols x the target card width
-     and centres it. Only `--cols` / `--card-max` change per count + viewport. */
+     overflow. The grid fills the shared play column (see above); `max-width`
+     only reins in the 1- and 2-card cases so a lone card is not huge. */
   --cols: 2;
-  --card-max: 190px;
   --grid-gap: clamp(0.5rem, 2vw, 0.9rem);
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   gap: var(--grid-gap);
   width: 100%;
-  max-width: calc(
-    var(--cols) * var(--card-max) + (var(--cols) - 1) * var(--grid-gap)
-  );
   margin-inline: auto;
 }
 
 .grid[data-count="1"] {
   --cols: 1;
-  --card-max: 230px;
+  max-width: 240px;
+}
+
+.grid[data-count="2"] {
+  max-width: 460px;
 }
 
 /* Three across once there is room (3 / 5 / 6 cards). */
-@media (min-width: 680px) {
+@media (min-width: 620px) {
   .grid[data-count="3"],
   .grid[data-count="5"],
   .grid[data-count="6"] {
@@ -159,12 +169,10 @@ body {
   }
 }
 
-/* Four cards go to a single row only when four columns comfortably fit;
-   below that they stay 2 x 2. */
-@media (min-width: 900px) {
+/* Four cards go to a single row when four columns fit; below that, 2 x 2. */
+@media (min-width: 760px) {
   .grid[data-count="4"] {
     --cols: 4;
-    --card-max: 180px;
   }
 }
 
@@ -403,11 +411,10 @@ body {
 /* --- action buttons ------------------------------------------------- */
 
 .actions {
+  /* width comes from the shared .stage/.controls/.actions rule above */
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.6rem;
-  max-width: 520px;
-  margin-inline: auto;
 }
 
 /* Two-by-two once the buttons have room for their labels on one line. */
