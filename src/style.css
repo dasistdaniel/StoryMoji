@@ -123,31 +123,48 @@ body {
   gap: 1rem;
 }
 
-/* Cards keep a sensible size at every count: columns never grow past a fixed
-   max, and the whole grid is centred. Column *count* changes with the number of
-   cards and the viewport width; the card itself is sized by its column, not by
-   the viewport (see the container query on .card). */
+/* Cards keep the SAME shape and a sensible size at every count: columns never
+   grow past a fixed max, the grid is centred, and the card's aspect ratio is
+   fixed (see .card) so only the column *count* changes with the number of cards
+   and the viewport width. Emoji / text scale with the card via a container
+   query, not the viewport. */
 .grid {
+  /* `--cols` fraction tracks always sum to the grid width, so they can never
+     overflow; `max-width` then caps the grid at cols x the target card width
+     and centres it. Only `--cols` / `--card-max` change per count + viewport. */
+  --cols: 2;
+  --card-max: 190px;
+  --grid-gap: clamp(0.5rem, 2vw, 0.9rem);
   display: grid;
-  gap: clamp(0.6rem, 2vw, 1rem);
-  justify-content: center;
-  grid-template-columns: repeat(2, minmax(0, 170px));
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  width: 100%;
+  max-width: calc(
+    var(--cols) * var(--card-max) + (var(--cols) - 1) * var(--grid-gap)
+  );
+  margin-inline: auto;
 }
 
 .grid[data-count="1"] {
-  grid-template-columns: minmax(0, 230px);
+  --cols: 1;
+  --card-max: 230px;
 }
 
-@media (min-width: 560px) {
-  .grid[data-count="3"] {
-    grid-template-columns: repeat(3, minmax(0, 190px));
-  }
-  .grid[data-count="4"] {
-    grid-template-columns: repeat(4, minmax(0, 165px));
-  }
+/* Three across once there is room (3 / 5 / 6 cards). */
+@media (min-width: 680px) {
+  .grid[data-count="3"],
   .grid[data-count="5"],
   .grid[data-count="6"] {
-    grid-template-columns: repeat(3, minmax(0, 190px));
+    --cols: 3;
+  }
+}
+
+/* Four cards go to a single row only when four columns comfortably fit;
+   below that they stay 2 x 2. */
+@media (min-width: 900px) {
+  .grid[data-count="4"] {
+    --cols: 4;
+    --card-max: 180px;
   }
 }
 
@@ -155,6 +172,13 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  /* Grid items default to min-width:auto (min-content). The category <select>
+     has a wide min-content (its longest option), which would blow the column
+     out; force the card to honour its 1fr track instead. */
+  min-width: 0;
+  /* One fixed shape for every card at every count. */
+  aspect-ratio: 5 / 6.4;
   border: 3px solid var(--accent, var(--line));
   background: var(--bg-2);
   border-radius: var(--radius);
@@ -175,6 +199,9 @@ body {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
   border: 0;
   border-bottom: 2px solid var(--accent, var(--line));
   background: var(--accent, var(--line));
@@ -198,20 +225,20 @@ body {
 }
 
 .card__face {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 4cqw;
+  min-width: 0;
   min-height: 0;
-  padding: 6cqw 0.5rem;
+  padding: 5cqw 0.5rem;
   border: 0;
   background: transparent;
   color: inherit;
   font-family: inherit;
   cursor: pointer;
-  aspect-ratio: 3 / 4;
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
@@ -227,15 +254,19 @@ body {
 }
 
 .card .emoji {
-  font-size: clamp(2rem, 34cqw, 3.4rem);
+  font-size: clamp(2.2rem, 38cqw, 4.6rem);
   line-height: 1;
 }
 
 .card__term {
   font-weight: 800;
-  font-size: clamp(0.85rem, 12cqw, 1.15rem);
+  font-size: clamp(0.8rem, 10cqw, 1.35rem);
   text-align: center;
-  overflow-wrap: anywhere;
+  line-height: 1.15;
+  /* long German words wrap to a second line with a hyphen rather than being
+     chopped mid-word */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 @keyframes pop {
