@@ -19,7 +19,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 
 ### Ziele
 - Sofort spielbar ohne Anleitung, ohne Konto, ohne Installation.
-- Funktioniert offline nach dem ersten Laden (installierbare PWA, optional).
+- Installierbar (PWA-Manifest) ab v1; vollständiger Offline-Betrieb ab v1.1.
 - Mehrsprachig: Deutsch (primär) und Englisch (sekundär), leicht erweiterbar.
 - Kindgerechtes, buntes, freundliches Design mit großen Klickflächen.
 - Minimaler Betriebsaufwand: statische Dateien hinter nginx, kein Server-State.
@@ -104,11 +104,30 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-25: Umschalten übersetzt UI, Begriffe und Spielideen sofort ohne Reload;
   die gezogenen Karten bleiben dieselben (nur der Begriff wechselt die Sprache).
 
-### 4.7 Sonstiges
-- FR-26: "Teilen/Screenshot"-freundlich: aktuelle Ziehung als Permalink
-  (Kartenstand + Kategorie in URL-Hash kodiert), damit man dieselbe Ziehung
-  erneut öffnen kann. Optional für v1.
-- FR-27: Vollbild-Button für Präsentation am großen Bildschirm. Optional.
+### 4.7 Teilbare Ziehung (v1)
+- FR-26: Die aktuelle Ziehung (Karten-IDs + Kategorie + Anzahl) wird in den
+  URL-Hash kodiert. Öffnet man diesen Link, wird exakt dieselbe Ziehung
+  wiederhergestellt (unabhängig von Sprache und lokalem Zustand).
+- FR-27: Button "Ziehung teilen" kopiert den Link in die Zwischenablage
+  (Fallback: Link zum Markieren anzeigen). Wo verfügbar, `navigator.share`.
+- FR-28: Der Hash wird bei jeder Änderung der Ziehung aktualisiert
+  (`history.replaceState`, kein zusätzlicher History-Eintrag).
+- FR-29: Ungültige/veraltete Karten-IDs im Hash werden ignoriert, fehlende
+  Karten mit Zufallskarten aufgefüllt.
+
+### 4.8 Sound (v1)
+- FR-30: Dezente Soundeffekte beim Ziehen einer Karte, beim Nachziehen und
+  beim "Alle mischen". Kurze, weiche Töne (kindgerecht, nicht schrill).
+- FR-31: Sound ist standardmäßig AUS. Ein sichtbarer Toggle (Lautsprecher-
+  Symbol) schaltet ihn ein/aus; die Wahl wird in localStorage gespeichert.
+- FR-32: Audio-Assets selbst gehostet (kleine `.ogg`/`.mp3`, gesamt < 30 KB),
+  vorgeladen erst nach erster Nutzerinteraktion (Autoplay-Policy).
+- FR-33: Bei `prefers-reduced-motion` bleibt Sound möglich, ist aber weiter
+  opt-in; keine Kopplung an Animationen.
+
+### 4.9 Sonstiges
+- FR-34: Vollbild-Button für Präsentation am großen Bildschirm. Optional,
+  nicht v1-kritisch.
 
 ## 5. Nicht-funktionale Anforderungen
 
@@ -131,17 +150,26 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 
 ## 6. Technischer Ansatz
 
-### 6.1 Technologie-Empfehlung
+### 6.1 Technologie-Entscheidungen (festgelegt)
 - **Build-Tool:** Vite (nur für Entwicklung/Build; Ergebnis ist statisch).
-- **Framework:** Kein schweres Framework nötig. Empfehlung: Vanilla JS
-  (ES-Module) oder leichtgewichtig Preact. Entscheidung im ersten Sprint.
+- **Framework:** Vanilla JS mit ES-Modulen, kein Framework. Rendering über
+  kleine Hilfsfunktionen (z. B. ein Mini-`h()`/Template-Literal-Ansatz).
+  Begründung: geringer Umfang, minimale Bundle-Größe, keine Abhängigkeiten.
 - **Styling:** Reines CSS mit Custom Properties (Theme-Farben, Spacing),
   CSS Grid für das Kartenraster. Kein CSS-Framework.
 - **i18n:** Eigene kleine Lösung: JSON-Dateien pro Sprache + `t(key)`-Funktion.
-- **PWA (optional):** `manifest.webmanifest` + Service Worker (Workbox oder
-  handgeschrieben) für Offline-Betrieb und "Zum Homescreen hinzufügen".
-- **Icons/Emoji:** Unicode-Emoji nativ rendern. Optional Twemoji-SVGs
-  (selbst gehostet) für einheitliche Darstellung über alle Geräte.
+- **Emoji:** In v1 native Unicode-Emojis. Die Darstellung läuft über EINE
+  gekapselte Funktion `renderEmoji(emoji)` in `ui/`, sodass später Twemoji-SVGs
+  (selbst gehostet) ohne Umbau der übrigen Logik ergänzt werden können.
+- **PWA:** In v1 nur `manifest.webmanifest` + Icons (installierbar / "Zum
+  Homescreen hinzufügen"). Ein Service Worker für vollständigen Offline-Betrieb
+  kommt in v1.1 (siehe Meilensteine / Ausblick).
+- **Sound:** Kleine, selbst gehostete Audio-Dateien; Wiedergabe über eine
+  gekapselte `sound.js` (Web Audio API oder `<audio>`), opt-in, in localStorage
+  gemerkt.
+- **Teilen:** Ziehung wird im URL-Hash serialisiert (kompakte Kodierung der
+  Karten-IDs); `sharing.js` kümmert sich um Lesen/Schreiben des Hash und den
+  Kopier-/Share-Button.
 
 ### 6.2 Warum statisch reicht
 Alle Logik (Zufall, Ziehen, Mischen, i18n, Ideen) läuft im Browser. Die
@@ -197,25 +225,33 @@ Zustand zwischen Nutzern, daher kein Server, keine DB.
 
 ```
 state = {
-  language: "de",
-  category: "all",
-  count: 3,
-  drawn: [cardId, cardId, cardId]   // aktuelle Ziehung
+  language: "de",       // localStorage
+  category: "all",      // localStorage
+  count: 3,             // localStorage
+  soundEnabled: false,  // localStorage
+  drawn: [cardId, ...]  // aktuelle Ziehung – localStorage + URL-Hash
 }
 ```
 
-Persistiert in `localStorage` unter einem Schlüssel `emoji-cards:v1`.
-`drawn` optional zusätzlich im URL-Hash für teilbare Ziehungen.
+Einstellungen persistieren in `localStorage` unter `emoji-cards:v1`.
+Die aktuelle Ziehung (`drawn` + `category` + `count`) wird zusätzlich im
+URL-Hash serialisiert. Beim Laden gilt: Hash schlägt localStorage, localStorage
+schlägt Standardwerte.
 
 ### 6.5 Kernfunktionen (Module)
 
-- `store.js` – Zustand laden/speichern, Subscribe.
+- `store.js` – Zustand laden/speichern (localStorage), Subscribe.
 - `deck.js` – `drawCards(category, count, exclude)`, `redrawOne(index)`,
   `shuffleAll()`; nutzt `crypto.getRandomValues` + Fisher-Yates.
 - `i18n.js` – `t(key)`, `setLanguage(lang)`, Platzhalter-Ersetzung.
 - `prompts.js` – `randomPrompt()`, füllt `{card}`-Platzhalter.
-- `ui/` – Rendering von Kartenraster, Steuerleiste, Ideen-Panel.
-- `pwa/` – Service Worker + Manifest (optional).
+- `sharing.js` – Ziehung ↔ URL-Hash serialisieren/parsen, "Teilen"-Button
+  (Clipboard + `navigator.share`).
+- `sound.js` – `play(name)`, `setEnabled(bool)`; lädt Assets nach erster
+  Interaktion, respektiert `soundEnabled`.
+- `ui/` – Rendering von Kartenraster, Steuerleiste, Ideen-Panel; enthält
+  `renderEmoji(emoji)` als einzige Emoji-Ausgabestelle (Twemoji-fähig).
+- `pwa/` – `manifest.webmanifest` + Icons in v1; Service Worker ab v1.1.
 
 ### 6.6 Projektstruktur (Vorschlag)
 
@@ -233,6 +269,8 @@ emoji-cards/
 │  ├─ deck.js
 │  ├─ i18n.js
 │  ├─ prompts.js
+│  ├─ sharing.js
+│  ├─ sound.js
 │  ├─ ui/
 │  └─ data/
 │     ├─ cards.json
@@ -240,6 +278,8 @@ emoji-cards/
 │     └─ i18n/
 │        ├─ de.json
 │        └─ en.json
+├─ public/
+│  └─ sounds/               # kleine, selbst gehostete Audio-Assets
 ├─ dist/                    # Build-Ergebnis (wird von nginx ausgeliefert)
 ├─ package.json
 ├─ vite.config.js
@@ -259,8 +299,10 @@ emoji-cards/
 - **Bedienung:** Große Touch-Ziele (mind. 44×44 px). Wichtige Aktionen
   ("Alle mischen", "Spielidee") als große Buttons unten, gut mit dem Daumen
   erreichbar.
-- **Feedback:** Kurze Animation + optionaler dezenter Sound beim Ziehen
-  (standardmäßig aus, per Toggle einschaltbar).
+- **Feedback:** Kurze Animation beim Ziehen; dazu dezenter Sound (standardmäßig
+  aus, per Lautsprecher-Toggle einschaltbar – siehe FR-30 ff.).
+- **Teilen:** Sichtbarer "Ziehung teilen"-Button erzeugt einen Link, der genau
+  diese Kartenkombination wiederherstellt (siehe FR-26 ff.).
 - **Kein Text-Overload:** Wenig UI-Text, viel Symbolik, aber alles mit
   Screenreader-Label.
 
@@ -329,27 +371,36 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 - Unit-Tests (Vitest) für `deck.js` (Zufall/Eindeutigkeit/Nachziehen),
   `i18n.js`, `prompts.js` (Platzhalter).
 - Manuelle Testmatrix: iOS Safari, Android Chrome, Desktop Firefox/Chrome.
-- Lighthouse-Ziel: Performance ≥ 95, Accessibility ≥ 95, Best Practices ≥ 95,
-  PWA "installable" (falls PWA umgesetzt).
+- Lighthouse-Ziel: Performance ≥ 95, Accessibility ≥ 95, Best Practices ≥ 95;
+  ab v1 "installable", ab v1.1 voll PWA-tauglich (Offline).
+- Tests für `sharing.js` (Hash ↔ Ziehung, Round-Trip, ungültige IDs) und
+  `sound.js` (kein Ton bei `soundEnabled = false`).
 - Datencheck-Skript: prüft, dass jede Karte eine gültige Kategorie hat und
   in allen Sprachen einen Begriff besitzt.
 
 ## 11. Meilensteine
 
-1. **M1 – Grundgerüst:** Projekt-Setup (Vite), Kartenraster, Zufallsziehung,
-   Anzahl 1–6, "Alle mischen", Einzelkarte nachziehen. Nur Deutsch, feste Farben.
+1. **M1 – Grundgerüst:** Projekt-Setup (Vite, Vanilla JS), Kartenraster,
+   Zufallsziehung, Anzahl 1–6, "Alle mischen", Einzelkarte nachziehen.
+   Nur Deutsch, feste Farben, native Emojis über `renderEmoji()`.
 2. **M2 – Kategorien:** Kategorieauswahl, "Alle Kategorien", Persistenz in
    localStorage, Kategorie-Akzentfarben.
 3. **M3 – Spielideen:** Ideen-Panel, Platzhalter-Ersetzung, "Nächste Idee".
 4. **M4 – i18n:** DE/EN-Umschalter, alle Texte lokalisiert, Browsersprache-Default.
-5. **M5 – Design-Feinschliff:** Schriften, Animationen, Dark Mode,
+5. **M5 – Teilen & Sound:** Ziehung im URL-Hash serialisieren, "Ziehung
+   teilen"-Button (Clipboard/`navigator.share`); Soundeffekte + opt-in-Toggle.
+6. **M6 – Design-Feinschliff:** Schriften, Animationen, Dark Mode,
    Accessibility-Durchgang, responsive Feinheiten.
-6. **M6 – Inhalte:** Karten- und Ideen-Datenbank auf Zielumfang füllen.
-7. **M7 – PWA & Deployment:** Manifest, Service Worker, nginx-Setup,
-   optionale CI. Release v1.0.
+7. **M7 – Inhalte:** Karten- und Ideen-Datenbank auf Zielumfang füllen.
+8. **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` + Icons
+   (installierbar), nginx-Setup, optionale CI. **Release v1.0.**
+9. **M9 – Offline (v1.1):** Service Worker (Precache aller App-Assets +
+   Daten), Update-Handling ("Neue Version verfügbar"), Offline-Test.
 
-## 12. Ausblick (nach v1)
+## 12. Ausblick (nach v1.1)
 
+- Twemoji-SVGs als einheitliche Emoji-Darstellung (in `renderEmoji()` bereits
+  vorbereitet), umschaltbar oder als Standard.
 - Eigener Karten-Editor / Import eigener Wortlisten.
 - Weitere Sprachen (FR, ES, ...).
 - "Timer"-Modus (Geschichte in 60 Sekunden).
@@ -357,11 +408,19 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 - Würfel-Wurf-Modus mit 9 Karten wie klassische Story Cubes.
 - Vorlese-Funktion (Web Speech API) für die Begriffe.
 - Favoriten / gespeicherte Lieblingsziehungen.
+- Vollbild-/Präsentationsmodus (FR-34).
 
-## 13. Offene Punkte / Entscheidungen
+## 13. Getroffene Entscheidungen
 
-- Vanilla JS oder Preact? (Empfehlung: mit Vanilla starten.)
-- Native Emoji oder Twemoji-SVG? (Empfehlung: nativ in v1, Twemoji als Option.)
-- PWA in v1 oder v1.1? (Empfehlung: Manifest in v1, Service Worker in v1.1.)
-- Teilbare Ziehung per URL-Hash – v1 oder später?
-- Sound-Effekte – gewünscht?
+| Frage | Entscheidung |
+| --- | --- |
+| UI-Technologie | **Vanilla JS** (ES-Module, kein Framework), Rendering über kleine Helfer |
+| Emoji-Darstellung | **Native Emojis in v1**; gekapselt in `renderEmoji()`, Twemoji später ohne Umbau nachrüstbar |
+| PWA | **Manifest + Icons in v1** (installierbar); **Service Worker / Offline in v1.1** |
+| Teilbare Ziehung | **In v1** – Ziehung im URL-Hash, "Ziehung teilen"-Button (FR-26 ff.) |
+| Sound-Effekte | **In v1** – dezente Töne, standardmäßig aus, opt-in-Toggle in localStorage (FR-30 ff.) |
+
+Noch offen / später zu klären:
+- Konkrete Schriftart (Nunito / Baloo 2 / Fredoka) – im Design-Meilenstein.
+- Dark Mode: nur `prefers-color-scheme` folgen oder zusätzlich manueller Toggle?
+- Genaue Kodierung des URL-Hash (lesbare IDs vs. kompakte Base64-Indizes).
