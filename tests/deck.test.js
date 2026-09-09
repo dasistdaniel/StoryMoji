@@ -8,6 +8,7 @@ import {
   redrawSlot,
   reshuffleSlots,
   resizeSlots,
+  randomCategories,
   cardsByIds,
   ALL_CATEGORIES,
 } from "../src/deck.js";
@@ -128,6 +129,33 @@ describe("redrawSlot", () => {
     for (let i = 0; i < 10; i++) {
       expect(redrawSlot(mixed, slots, 0).category).toBe("food");
     }
+  });
+});
+
+describe("randomCategories", () => {
+  const ids = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"];
+
+  it("returns the requested number of ids, distinct when the pool allows", () => {
+    const got = randomCategories(ids, 6);
+    expect(got).toHaveLength(6);
+    expect(new Set(got).size).toBe(6);
+    expect(got.every((id) => ids.includes(id))).toBe(true);
+  });
+
+  it("never returns the 'all' sentinel", () => {
+    for (let i = 0; i < 20; i++) {
+      expect(randomCategories(ids, 6)).not.toContain(ALL_CATEGORIES);
+    }
+  });
+
+  it("allows repeats only when count exceeds the pool", () => {
+    const got = randomCategories(["x", "y"], 4);
+    expect(got).toHaveLength(4);
+    expect(new Set(got).size).toBe(2);
+  });
+
+  it("falls back to 'all' when there are no categories", () => {
+    expect(randomCategories([], 3)).toEqual(["all", "all", "all"]);
   });
 });
 

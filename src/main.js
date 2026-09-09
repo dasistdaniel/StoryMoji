@@ -19,6 +19,7 @@ import {
   redrawSlot,
   reshuffleSlots,
   resizeSlots,
+  randomCategories,
   cardsByIds,
 } from "./deck.js";
 import { createStore, loadSettings } from "./store.js";
@@ -161,6 +162,16 @@ function handleSlotCategory(index, value) {
 /** Redraw every card from its own slot category. */
 function handleShuffle() {
   commitSlots(reshuffleSlots(CARDS, store.get().slots), "shuffle");
+}
+
+/** Assign a fresh random category to every slot and draw matching cards. */
+function handleShuffleCategories() {
+  const count = store.get().slots.length;
+  const categories = randomCategories(
+    CATEGORIES.map((cat) => cat.id),
+    count
+  );
+  commitSlots(drawSlots(CARDS, categories), "shuffle");
 }
 
 /** Change how many cards are on the table (existing slots are kept). */
@@ -331,6 +342,11 @@ function buildActions() {
       "button",
       { class: "btn btn--primary", type: "button", onClick: handleShuffle },
       ["🔀 ", t("controls.shuffle")]
+    ),
+    el(
+      "button",
+      { class: "btn", type: "button", onClick: handleShuffleCategories },
+      ["🎲 ", t("controls.shuffleCategories")]
     ),
     el(
       "button",

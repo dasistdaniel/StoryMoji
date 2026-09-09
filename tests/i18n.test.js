@@ -45,7 +45,7 @@ describe("resolveLanguage", () => {
 describe("createTranslator", () => {
   it("translates known keys", () => {
     const t = createTranslator("en");
-    expect(t("controls.shuffle")).toBe("Shuffle all");
+    expect(t("controls.shuffle")).toBe("Shuffle cards");
   });
 
   it("interpolates params", () => {

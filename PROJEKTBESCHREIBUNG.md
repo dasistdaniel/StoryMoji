@@ -40,8 +40,9 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
    Kategorien".
 2. Nutzer stellt die Anzahl Karten auf 4 und wählt für die erste Karte die
    Kategorie "Tiere", für die zweite "Fahrzeuge", die anderen bleiben gemischt.
-3. Nutzer tippt auf "Alle mischen" – jede Karte wird neu gezogen, jeweils aus
-   ihrer eigenen Kategorie.
+3. Nutzer tippt auf "Karten mischen" – jede Karte wird neu gezogen, jeweils aus
+   ihrer eigenen Kategorie. (Mit "Kategorien mischen" werden stattdessen die
+   Kategorien selbst neu ausgewürfelt.)
 4. Eine Karte passt nicht in die Geschichte – Nutzer tippt auf genau diese Karte,
    sie wird durch eine neue zufällige Karte (aus der Kategorie dieser Karte)
    ersetzt.
@@ -88,8 +89,8 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Slot aus allen Stapeln zusammen.
 - FR-10: Ändert man die Kategorie eines Slots, wird sofort eine passende neue
   Karte für diesen Slot gezogen. Die anderen Karten bleiben unverändert.
-- FR-10a: Beim Nachziehen ("Alle mischen" oder Tap auf eine Karte) bleibt die
-  pro Slot gewählte Kategorie erhalten.
+- FR-10a: Beim Nachziehen ("Karten mischen" oder Tap auf eine Karte) bleibt die
+  pro Slot gewählte Kategorie erhalten. Nur "Kategorien mischen" ändert sie.
 - FR-11: Vorgeschlagene Kategorien (Startumfang):
   Tiere, Gegenstände, Natur, Essen, Menschen & Berufe, Orte, Fahrzeuge,
   Gefühle, Fantasie & Magie, Wetter & Himmel, Sport & Freizeit, Symbole.
@@ -100,8 +101,11 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 
 - FR-13: Klick/Tap auf eine einzelne Karte ersetzt nur diese durch eine neue
   zufällige Karte aus der Kategorie **dieses Slots**.
-- FR-14: Button "Alle mischen" zieht jede Karte neu – jeweils aus der Kategorie
-  ihres Slots.
+- FR-14: Button "Karten mischen" zieht jede Karte neu – jeweils aus der Kategorie
+  ihres Slots (Slot-Kategorien bleiben).
+- FR-14a: Button "Kategorien mischen" weist jedem Slot eine neue zufällige
+  Kategorie zu (aus den echten Kategorien, nie "Alle Kategorien"; verschieden,
+  solange genug Kategorien da sind) und zieht dazu passende Karten.
 - FR-15: Ziehen ist so weit wie möglich ohne Zurücklegen: keine Karte erscheint
   doppelt, solange die beteiligten Kategorien genug Einträge haben.
 - FR-16: Reichen die Karten einer Kategorie nicht (z. B. mehrere Slots derselben
@@ -148,7 +152,8 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 ### 4.8 Sound (v1)
 
 - FR-30: Dezente Soundeffekte beim Ziehen einer Karte, beim Nachziehen und
-  beim "Alle mischen". Kurze, weiche Töne (kindgerecht, nicht schrill).
+  beim "Karten mischen" / "Kategorien mischen". Kurze, weiche Töne (kindgerecht,
+  nicht schrill).
 - FR-31: Sound ist standardmäßig AUS. Ein sichtbarer Toggle (Lautsprecher-
   Symbol) schaltet ihn ein/aus; die Wahl wird in localStorage gespeichert.
 - FR-32: Audio-Assets selbst gehostet (kleine `.ogg`/`.mp3`, gesamt < 30 KB),
@@ -281,7 +286,8 @@ schlägt Standardwerte (3 Slots × "Alle Kategorien").
   `persist(state)`-Serializer nach localStorage.
 - `deck.js` – reine Slot-Logik: `drawOne(cards, category, exclude)`,
   `drawSlots(cards, categories)`, `redrawSlot(cards, slots, index)`,
-  `reshuffleSlots`, `resizeSlots`; nutzt `crypto.getRandomValues` + Fisher-Yates.
+  `reshuffleSlots`, `resizeSlots`, `randomCategories(ids, count)`; nutzt
+  `crypto.getRandomValues` + Fisher-Yates.
 - `i18n.js` – `createTranslator(lang)` → `t(key, params)`, `{token}`-Ersetzung.
 - `prompts.js` – `randomPrompt()`, füllt `{card}`-Platzhalter aus der Hand.
 - `sharing.js` – Slots ↔ URL-Hash serialisieren/parsen, "Teilen"-Button
@@ -336,9 +342,10 @@ emoji-cards/
   (Karten-Rahmen/Badge). Dunkelmodus optional über `prefers-color-scheme`.
 - **Typografie:** Gut lesbare, runde Schrift (z. B. Nunito, Baloo 2, Fredoka) –
   selbst gehostet.
-- **Bedienung:** Große Touch-Ziele (mind. 44×44 px). Wichtige Aktionen
-  ("Alle mischen", "Spielidee") als große Buttons unten, gut mit dem Daumen
-  erreichbar.
+- **Bedienung:** Große Touch-Ziele (mind. 44×44 px). Die vier Aktionen
+  ("Karten mischen", "Kategorien mischen", "Spielidee", "Ziehung teilen") als
+  große Buttons unten – 2 × 2 ab 420 px Breite, darunter gestapelt – gut mit
+  dem Daumen erreichbar.
 - **Feedback:** Kurze Animation beim Ziehen; dazu dezenter Sound (standardmäßig
   aus, per Lautsprecher-Toggle einschaltbar – siehe FR-30 ff.).
 - **Teilen:** Sichtbarer "Ziehung teilen"-Button erzeugt einen Link, der genau
@@ -427,7 +434,7 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
 
 1. ✅ **M1 – Grundgerüst:** Projekt-Setup (Vite, Vanilla JS), Kartenraster,
-   Zufallsziehung, Anzahl 1–6, "Alle mischen", Einzelkarte nachziehen.
+   Zufallsziehung, Anzahl 1–6, "Karten mischen", Einzelkarte nachziehen.
    Native Emojis über `renderEmoji()`.
 2. ✅ **M2 – Kategorien:** Kategorieauswahl **pro Karte** (Dropdown an jeder
    Karte), "Alle Kategorien", Persistenz der Slot-Kategorien in localStorage,

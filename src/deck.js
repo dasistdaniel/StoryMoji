@@ -7,7 +7,7 @@
 // Each card on the table sits in a "slot" that carries its own category, so
 // slots are drawn independently (see PROJEKTBESCHREIBUNG section 4.3).
 
-import { randomInt } from "./rng.js";
+import { randomInt, shuffle } from "./rng.js";
 
 export const ALL_CATEGORIES = "all";
 export const MIN_CARDS = 1;
@@ -113,6 +113,25 @@ export function redrawSlot(cards, slots, index, rng) {
     .map((s) => s.card?.id)
     .filter(Boolean);
   return drawOne(cards, slot.category, othersIds, rng) || slot.card;
+}
+
+/**
+ * Pick `count` categories at random, distinct where `categoryIds` is large
+ * enough (with 12 categories and at most 6 slots that is always the case).
+ * Never returns {@link ALL_CATEGORIES} – the point is concrete stacks.
+ * @param {string[]} categoryIds real category ids to choose from
+ * @param {number} count
+ * @param {() => number} [rng]
+ * @returns {string[]}
+ */
+export function randomCategories(categoryIds, count, rng) {
+  if (categoryIds.length === 0) return Array(count).fill(ALL_CATEGORIES);
+  const shuffled = shuffle(categoryIds, rng);
+  const result = shuffled.slice(0, count);
+  while (result.length < count) {
+    result.push(shuffled[randomInt(shuffled.length, rng)]);
+  }
+  return result;
 }
 
 /**

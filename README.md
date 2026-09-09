@@ -59,8 +59,9 @@ public/                 manifest + icons (copied verbatim into dist/)
 - The **current draw** – one `category,cardId` pair per slot – lives in
   `location.hash`, so any draw is shareable via its URL. Language, the sound
   toggle and the per-slot categories are stored in `localStorage`.
-- Tapping a card replaces just that card (from its slot's category); "Shuffle
-  all" redraws every card from its own slot category.
+- Tapping a card replaces just that card (from its slot's category). "Shuffle
+  cards" redraws every card from its own slot category; "Shuffle categories"
+  rolls a fresh random category for every slot and draws matching cards.
 - Increasing the card count keeps the cards already on the table and only adds
   new slots (which inherit the last slot's category).
 - All randomness goes through `crypto.getRandomValues` (Fisher–Yates shuffle).

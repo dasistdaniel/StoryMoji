@@ -96,6 +96,28 @@ describe("app boot", () => {
     expect(dealt).toEqual([false, true, false]);
   });
 
+  it("'Kategorien mischen' assigns a fresh random category to every slot", async () => {
+    const app = await boot();
+    const before = [...app.querySelectorAll("select.card__cat")].map(
+      (s) => s.value
+    );
+    expect(before).toEqual(["all", "all", "all"]);
+
+    const btn = [...app.querySelectorAll(".actions .btn")].find((b) =>
+      b.textContent.includes("Kategorien mischen")
+    );
+    btn.click();
+
+    const after = [...app.querySelectorAll("select.card__cat")].map(
+      (s) => s.value
+    );
+    expect(after).toHaveLength(3);
+    expect(after.every((c) => c !== "all")).toBe(true);
+    expect(new Set(after).size).toBe(3); // distinct
+    // hash records the new categories
+    expect(location.hash.split(",")[0]).toBe("#draw=" + after[0]);
+  });
+
   it("increasing the count keeps existing cards and adds new ones", async () => {
     const app = await boot();
     const before = [...app.querySelectorAll(".card__term")].map(

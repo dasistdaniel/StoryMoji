@@ -4,3 +4,7 @@ package-lock.json
 
 # The original idea note – keep it exactly as written.
 idee.md
+
+# Card data – kept compact (one card per line) so non-developers can scan
+# and edit it easily.
+src/data/cards.json

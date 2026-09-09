@@ -403,22 +403,37 @@ body {
 /* --- action buttons ------------------------------------------------- */
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 0.6rem;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+/* Two-by-two once the buttons have room for their labels on one line. */
+@media (min-width: 420px) {
+  .actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .btn {
-  flex: 1 1 8rem;
+  min-width: 0;
   min-height: 3.25rem;
-  padding: 0 1rem;
+  padding: 0.35rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.15rem;
   border-radius: 999px;
   border: 3px solid var(--ink);
   background: var(--bg-2);
   color: var(--ink);
   font-family: inherit;
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
+  line-height: 1.15;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: transform 0.12s ease;
