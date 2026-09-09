@@ -91,9 +91,9 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Karte für diesen Slot gezogen. Die anderen Karten bleiben unverändert.
 - FR-10a: Beim Nachziehen ("Karten mischen" oder Tap auf eine Karte) bleibt die
   pro Slot gewählte Kategorie erhalten. Nur "Kategorien mischen" ändert sie.
-- FR-11: Vorgeschlagene Kategorien (Startumfang):
-  Tiere, Gegenstände, Natur, Essen, Menschen & Berufe, Orte, Fahrzeuge,
-  Gefühle, Fantasie & Magie, Wetter & Himmel, Sport & Freizeit, Symbole.
+- FR-11: Kategorien (Startumfang): Tiere, Gegenstände, Natur, Essen,
+  Menschen & Berufe, Orte, Fahrzeuge, Gefühle, Fantasie & Magie,
+  Wetter & Himmel, Sport & Freizeit, Symbole, Zahlen (0–9, feste 10er-Menge).
 - FR-12: Die pro Slot gewählten Kategorien werden lokal gespeichert (Array).
   Neue Slots (Anzahl erhöhen) übernehmen die Kategorie des letzten Slots.
 
@@ -419,7 +419,7 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 
 ## 9. Inhaltsumfang v1
 
-- Ca. 12 Kategorien.
+- Ca. 13 Kategorien (davon "Zahlen" mit fester 10er-Menge 0–9).
 - Mindestens 15 Karten pro Kategorie (Ziel: 20–30), also ~200–350 Karten gesamt.
 - Mindestens 15 Spielideen.
 - Vollständige DE- und EN-Übersetzung aller Karten, Ideen und UI-Texte.
@@ -454,7 +454,7 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
 6. 🟡 **M6 – Design-Feinschliff:** Farbschema, Animationen, Dark Mode und
    `prefers-reduced-motion` stehen. Offen: eigene Schriftart einbinden,
    Feinschliff, formaler Accessibility-Durchgang / Lighthouse.
-7. 🟡 **M7 – Inhalte:** 12 Kategorien, ~200 Karten, 18 Spielideen (DE + EN)
+7. 🟡 **M7 – Inhalte:** 13 Kategorien, ~213 Karten, 18 Spielideen (DE + EN)
    vorhanden. Ziel: auf 20–30 Karten je Kategorie ausbauen, Ideen erweitern.
 8. 🟡 **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` + SVG-Icons und
    `deploy/nginx.conf` stehen. Offen: gerasterte PNG-Icons (192/512),

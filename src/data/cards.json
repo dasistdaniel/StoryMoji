@@ -12,7 +12,8 @@
     { "id": "fantasy", "label": { "de": "Fantasie & Magie", "en": "Fantasy & Magic" }, "color": "#c77dff" },
     { "id": "weather", "label": { "de": "Wetter & Himmel", "en": "Weather & Sky" }, "color": "#48cae4" },
     { "id": "sport", "label": { "de": "Sport & Freizeit", "en": "Sport & Leisure" }, "color": "#06d6a0" },
-    { "id": "symbols", "label": { "de": "Symbole", "en": "Symbols" }, "color": "#ef476f" }
+    { "id": "symbols", "label": { "de": "Symbole", "en": "Symbols" }, "color": "#ef476f" },
+    { "id": "numbers", "label": { "de": "Zahlen", "en": "Numbers" }, "color": "#ffc6ff" }
   ],
   "cards": [
     { "id": "animals-dog", "category": "animals", "emoji": "🐶", "term": { "de": "Hund", "en": "Dog" } },
@@ -228,6 +229,17 @@
     { "id": "symbols-puzzle", "category": "symbols", "emoji": "🧩", "term": { "de": "Puzzleteil", "en": "Puzzle piece" } },
     { "id": "symbols-anchor", "category": "symbols", "emoji": "⚓", "term": { "de": "Anker", "en": "Anchor" } },
     { "id": "symbols-handshake", "category": "symbols", "emoji": "🤝", "term": { "de": "Handschlag", "en": "Handshake" } },
-    { "id": "symbols-footprints", "category": "symbols", "emoji": "👣", "term": { "de": "Fußspuren", "en": "Footprints" } }
+    { "id": "symbols-footprints", "category": "symbols", "emoji": "👣", "term": { "de": "Fußspuren", "en": "Footprints" } },
+
+    { "id": "numbers-0", "category": "numbers", "emoji": "0️⃣", "term": { "de": "Null", "en": "Zero" } },
+    { "id": "numbers-1", "category": "numbers", "emoji": "1️⃣", "term": { "de": "Eins", "en": "One" } },
+    { "id": "numbers-2", "category": "numbers", "emoji": "2️⃣", "term": { "de": "Zwei", "en": "Two" } },
+    { "id": "numbers-3", "category": "numbers", "emoji": "3️⃣", "term": { "de": "Drei", "en": "Three" } },
+    { "id": "numbers-4", "category": "numbers", "emoji": "4️⃣", "term": { "de": "Vier", "en": "Four" } },
+    { "id": "numbers-5", "category": "numbers", "emoji": "5️⃣", "term": { "de": "Fünf", "en": "Five" } },
+    { "id": "numbers-6", "category": "numbers", "emoji": "6️⃣", "term": { "de": "Sechs", "en": "Six" } },
+    { "id": "numbers-7", "category": "numbers", "emoji": "7️⃣", "term": { "de": "Sieben", "en": "Seven" } },
+    { "id": "numbers-8", "category": "numbers", "emoji": "8️⃣", "term": { "de": "Acht", "en": "Eight" } },
+    { "id": "numbers-9", "category": "numbers", "emoji": "9️⃣", "term": { "de": "Neun", "en": "Nine" } }
   ]
 }
