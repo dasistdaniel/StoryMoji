@@ -1,0 +1,6 @@
+dist/
+node_modules/
+package-lock.json
+
+# The original idea note – keep it exactly as written.
+idee.md

@@ -1,0 +1,32 @@
+{
+  "app.title": "Emoji-Karten",
+  "app.tagline": "Zieh Karten und denk dir eine Geschichte aus!",
+
+  "controls.count.label": "Anzahl Karten",
+  "controls.count.set": "{n} Karten anzeigen",
+  "controls.category.label": "Kategorie",
+  "controls.category.all": "Alle Kategorien",
+  "controls.shuffle": "Alle mischen",
+  "controls.idea": "Spielidee",
+  "controls.idea.next": "Nächste Idee",
+  "controls.share": "Ziehung teilen",
+  "controls.language": "Sprache",
+  "controls.sound.on": "Ton an",
+  "controls.sound.off": "Ton aus",
+
+  "card.redraw": "Neue Karte für {term}",
+  "card.aria": "{term}, Kategorie {category}. Tippen für eine neue Karte.",
+
+  "idea.title": "Spielidee",
+  "idea.close": "Schließen",
+
+  "share.copied": "Link kopiert!",
+  "share.failed": "Kopieren hat nicht geklappt – Link markieren und kopieren.",
+
+  "notice.fewCards": "Diese Kategorie hat wenige Karten – einige können sich wiederholen.",
+
+  "footer.madeWith": "Mit Fantasie gemacht.",
+
+  "lang.de": "Deutsch",
+  "lang.en": "Englisch"
+}

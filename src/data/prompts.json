@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "prompts": [
+    {
+      "id": "superhero",
+      "text": {
+        "de": "Erzähle eine Superheldengeschichte mit den angezeigten Dingen.",
+        "en": "Tell a superhero story using the things shown."
+      }
+    },
+    {
+      "id": "princess-search",
+      "text": {
+        "de": "Die Prinzessin ist auf der Suche nach {card}. Was erlebt sie unterwegs?",
+        "en": "The princess is searching for {card}. What happens on the way?"
+      }
+    },
+    {
+      "id": "save-the-world",
+      "text": {
+        "de": "Wie können die Dinge zusammen die Welt retten?",
+        "en": "How can the things work together to save the world?"
+      }
+    },
+    {
+      "id": "animal-object-mix",
+      "text": {
+        "de": "Was passiert, wenn man {card} mit {card} kreuzt?",
+        "en": "What happens if you cross {card} with {card}?"
+      }
+    },
+    {
+      "id": "backwards",
+      "text": {
+        "de": "Erzähle die Geschichte rückwärts – vom Ende zum Anfang.",
+        "en": "Tell the story backwards – from the end to the beginning."
+      }
+    },
+    {
+      "id": "everything-alive",
+      "text": {
+        "de": "Alle Dinge sind plötzlich lebendig. Was sagen sie zueinander?",
+        "en": "All the things suddenly come alive. What do they say to each other?"
+      }
+    },
+    {
+      "id": "build-a-dream",
+      "text": {
+        "de": "Baue aus den Karten einen Traum, den jemand heute Nacht hat.",
+        "en": "Build a dream from the cards that someone has tonight."
+      }
+    },
+    {
+      "id": "treasure-hunt",
+      "text": {
+        "de": "Eine Schatzkarte führt zu {card}. Wer findet den Schatz zuerst?",
+        "en": "A treasure map leads to {card}. Who finds the treasure first?"
+      }
+    },
+    {
+      "id": "worst-day",
+      "text": {
+        "de": "Erzähle vom schlimmsten Tag, an dem alles mit {card} beginnt.",
+        "en": "Tell about the worst day ever that starts with {card}."
+      }
+    },
+    {
+      "id": "birthday-party",
+      "text": {
+        "de": "Plant zusammen eine Geburtstagsparty mit allen Dingen auf den Karten.",
+        "en": "Plan a birthday party together using everything on the cards."
+      }
+    },
+    {
+      "id": "lost-in-space",
+      "text": {
+        "de": "Ihr seid im Weltall verloren und habt nur diese Dinge dabei.",
+        "en": "You are lost in space with only these things."
+      }
+    },
+    {
+      "id": "magic-shop",
+      "text": {
+        "de": "In einem Zauberladen kann man {card} kaufen. Was kann es?",
+        "en": "In a magic shop you can buy {card}. What can it do?"
+      }
+    },
+    {
+      "id": "three-wishes",
+      "text": {
+        "de": "Du hast drei Wünsche. Einer davon ist {card}. Was noch?",
+        "en": "You have three wishes. One of them is {card}. What else?"
+      }
+    },
+    {
+      "id": "detective",
+      "text": {
+        "de": "{card} ist verschwunden! Löst gemeinsam den Fall.",
+        "en": "{card} has disappeared! Solve the case together."
+      }
+    },
+    {
+      "id": "friends",
+      "text": {
+        "de": "Wie werden {card} und {card} beste Freunde?",
+        "en": "How do {card} and {card} become best friends?"
+      }
+    },
+    {
+      "id": "tiny-world",
+      "text": {
+        "de": "Alles wird winzig klein. Wie sieht der Tag jetzt aus?",
+        "en": "Everything turns tiny. What does the day look like now?"
+      }
+    },
+    {
+      "id": "song",
+      "text": {
+        "de": "Denkt euch ein kurzes Lied über {card} aus.",
+        "en": "Make up a short song about {card}."
+      }
+    },
+    {
+      "id": "rescue",
+      "text": {
+        "de": "{card} steckt in Schwierigkeiten. Wer hilft und wie?",
+        "en": "{card} is in trouble. Who helps, and how?"
+      }
+    }
+  ]
+}

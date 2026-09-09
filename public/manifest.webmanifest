@@ -1,0 +1,26 @@
+{
+  "name": "Emoji-Karten",
+  "short_name": "Emoji-Karten",
+  "description": "Zieh bunte Emoji-Karten und denk dir eine Geschichte aus.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff6ec",
+  "theme_color": "#4cc9f0",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Full-bleed background; artwork kept inside the safe zone (~80%). -->
+  <rect width="512" height="512" fill="#4cc9f0" />
+  <g stroke="#2b2340" stroke-width="14">
+    <rect x="150" y="168" width="130" height="190" rx="28" fill="#ff5d8f"
+      transform="rotate(-12 215 263)" />
+    <rect x="212" y="156" width="130" height="190" rx="28" fill="#ffd166"
+      transform="rotate(6 277 251)" />
+    <rect x="268" y="176" width="124" height="184" rx="28" fill="#06d6a0"
+      transform="rotate(16 330 268)" />
+  </g>
+</svg>

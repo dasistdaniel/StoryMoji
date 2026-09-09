@@ -1,0 +1,32 @@
+{
+  "app.title": "Emoji Cards",
+  "app.tagline": "Draw some cards and make up a story!",
+
+  "controls.count.label": "Number of cards",
+  "controls.count.set": "Show {n} cards",
+  "controls.category.label": "Category",
+  "controls.category.all": "All categories",
+  "controls.shuffle": "Shuffle all",
+  "controls.idea": "Play idea",
+  "controls.idea.next": "Next idea",
+  "controls.share": "Share draw",
+  "controls.language": "Language",
+  "controls.sound.on": "Sound on",
+  "controls.sound.off": "Sound off",
+
+  "card.redraw": "New card for {term}",
+  "card.aria": "{term}, category {category}. Tap for a new card.",
+
+  "idea.title": "Play idea",
+  "idea.close": "Close",
+
+  "share.copied": "Link copied!",
+  "share.failed": "Copying failed – select the link and copy it.",
+
+  "notice.fewCards": "This category has only a few cards – some may repeat.",
+
+  "footer.madeWith": "Made with imagination.",
+
+  "lang.de": "German",
+  "lang.en": "English"
+}

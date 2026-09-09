@@ -18,6 +18,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 ## 2. Ziele und Nicht-Ziele
 
 ### Ziele
+
 - Sofort spielbar ohne Anleitung, ohne Konto, ohne Installation.
 - Installierbar (PWA-Manifest) ab v1; vollständiger Offline-Betrieb ab v1.1.
 - Mehrsprachig: Deutsch (primär) und Englisch (sekundär), leicht erweiterbar.
@@ -26,6 +27,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - Code auf Englisch geschrieben und kommentiert.
 
 ### Nicht-Ziele (bewusst ausgeschlossen)
+
 - Kein Benutzerkonto, kein Login, kein Cloud-Sync.
 - Keine Datenbank, kein API-Server, keine serverseitige Logik.
 - Kein Tracking, keine Werbung, keine Cookies zu Marketingzwecken.
@@ -45,6 +47,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 ## 4. Funktionale Anforderungen
 
 ### 4.1 Kartenanzeige
+
 - FR-1: Es werden zwischen 1 und 6 Karten gleichzeitig angezeigt.
 - FR-2: Jede Karte zeigt ein Emoji (groß) und den zugehörigen Begriff in der
   aktiven Sprache.
@@ -56,12 +59,14 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   (per `prefers-reduced-motion` abschaltbar).
 
 ### 4.2 Anzahl der Karten
+
 - FR-5: Ein Steuerelement (Buttons 1–6 oder Plus/Minus) legt die Anzahl fest.
 - FR-6: Erhöhen der Anzahl zieht nur die neuen Karten zusätzlich, bestehende
   Karten bleiben unverändert. Verringern entfernt Karten von rechts.
 - FR-7: Die zuletzt gewählte Anzahl wird lokal gespeichert (localStorage).
 
 ### 4.3 Kategorien / Stapel
+
 - FR-8: Eine Kategorieauswahl (Dropdown oder Chips) bestimmt, aus welchem Stapel
   gezogen wird.
 - FR-9: Option "Alle Kategorien" (Standard) mischt alle Stapel zusammen.
@@ -72,6 +77,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-12: Die zuletzt gewählte Kategorie wird lokal gespeichert.
 
 ### 4.4 Ziehen und Mischen
+
 - FR-13: Klick/Tap auf eine einzelne Karte ersetzt nur diese durch eine neue
   zufällige Karte (aus der aktiven Kategorie).
 - FR-14: Button "Alle mischen" zieht alle sichtbaren Karten neu.
@@ -83,6 +89,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-17: Zufall über `crypto.getRandomValues` (Fisher-Yates-Shuffle).
 
 ### 4.5 Spielideen / Vorschläge
+
 - FR-18: Button "Spielidee" zeigt einen zufälligen Prompt aus einer Liste.
 - FR-19: Prompts sind lokalisiert und können Platzhalter nutzen, z. B.
   "Die Prinzessin ist auf der Suche nach {karte}" – Platzhalter werden mit
@@ -98,6 +105,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 - FR-21: Die Ideen-Anzeige lässt sich weiterklicken ("Nächste Idee").
 
 ### 4.6 Sprache
+
 - FR-22: Sprachumschalter DE/EN, sichtbar und mit Flaggen-/Textlabel.
 - FR-23: Standardsprache = Browsersprache, sonst Deutsch.
 - FR-24: Sprachwahl wird lokal gespeichert.
@@ -105,6 +113,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   die gezogenen Karten bleiben dieselben (nur der Begriff wechselt die Sprache).
 
 ### 4.7 Teilbare Ziehung (v1)
+
 - FR-26: Die aktuelle Ziehung (Karten-IDs + Kategorie + Anzahl) wird in den
   URL-Hash kodiert. Öffnet man diesen Link, wird exakt dieselbe Ziehung
   wiederhergestellt (unabhängig von Sprache und lokalem Zustand).
@@ -116,6 +125,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Karten mit Zufallskarten aufgefüllt.
 
 ### 4.8 Sound (v1)
+
 - FR-30: Dezente Soundeffekte beim Ziehen einer Karte, beim Nachziehen und
   beim "Alle mischen". Kurze, weiche Töne (kindgerecht, nicht schrill).
 - FR-31: Sound ist standardmäßig AUS. Ein sichtbarer Toggle (Lautsprecher-
@@ -126,6 +136,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   opt-in; keine Kopplung an Animationen.
 
 ### 4.9 Sonstiges
+
 - FR-34: Vollbild-Button für Präsentation am großen Bildschirm. Optional,
   nicht v1-kritisch.
 
@@ -151,6 +162,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
 ## 6. Technischer Ansatz
 
 ### 6.1 Technologie-Entscheidungen (festgelegt)
+
 - **Build-Tool:** Vite (nur für Entwicklung/Build; Ergebnis ist statisch).
 - **Framework:** Vanilla JS mit ES-Modulen, kein Framework. Rendering über
   kleine Hilfsfunktionen (z. B. ein Mini-`h()`/Template-Literal-Ansatz).
@@ -172,6 +184,7 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Kopier-/Share-Button.
 
 ### 6.2 Warum statisch reicht
+
 Alle Logik (Zufall, Ziehen, Mischen, i18n, Ideen) läuft im Browser. Die
 Kartendaten sind eine ausgelieferte JSON-Datei. Es gibt keinen gemeinsamen
 Zustand zwischen Nutzern, daher kein Server, keine DB.
@@ -312,18 +325,21 @@ Empfohlen: vor der Umsetzung 2–3 Mockups (Startbildschirm, Kartenraster
 ## 8. Build und Deployment
 
 ### Entwicklung
+
 ```
 npm install
 npm run dev      # Vite Dev-Server
 ```
 
 ### Build
+
 ```
 npm run build    # erzeugt dist/ (statische Dateien)
 npm run preview  # lokale Vorschau des Builds
 ```
 
 ### Deployment auf nginx
+
 1. `npm run build`
 2. Inhalt von `dist/` nach `/var/www/emoji-cards/` kopieren (rsync/scp/CI).
 3. nginx Server-Block:
@@ -356,6 +372,7 @@ Kein PHP, kein Reverse Proxy, kein Zertifikats-Sonderfall (Let's Encrypt
 optional). Updates = neue Dateien hochladen.
 
 ### CI (optional)
+
 GitHub Actions: bei Push auf `main` → `npm ci && npm run build` → per rsync/
 SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 
@@ -380,21 +397,27 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 
 ## 11. Meilensteine
 
-1. **M1 – Grundgerüst:** Projekt-Setup (Vite, Vanilla JS), Kartenraster,
+Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
+
+1. ✅ **M1 – Grundgerüst:** Projekt-Setup (Vite, Vanilla JS), Kartenraster,
    Zufallsziehung, Anzahl 1–6, "Alle mischen", Einzelkarte nachziehen.
-   Nur Deutsch, feste Farben, native Emojis über `renderEmoji()`.
-2. **M2 – Kategorien:** Kategorieauswahl, "Alle Kategorien", Persistenz in
+   Native Emojis über `renderEmoji()`.
+2. ✅ **M2 – Kategorien:** Kategorieauswahl, "Alle Kategorien", Persistenz in
    localStorage, Kategorie-Akzentfarben.
-3. **M3 – Spielideen:** Ideen-Panel, Platzhalter-Ersetzung, "Nächste Idee".
-4. **M4 – i18n:** DE/EN-Umschalter, alle Texte lokalisiert, Browsersprache-Default.
-5. **M5 – Teilen & Sound:** Ziehung im URL-Hash serialisieren, "Ziehung
+3. ✅ **M3 – Spielideen:** Ideen-Panel, Platzhalter-Ersetzung, "Nächste Idee".
+4. ✅ **M4 – i18n:** DE/EN-Umschalter, alle Texte lokalisiert,
+   Browsersprache-Default.
+5. ✅ **M5 – Teilen & Sound:** Ziehung im URL-Hash serialisieren, "Ziehung
    teilen"-Button (Clipboard/`navigator.share`); Soundeffekte + opt-in-Toggle.
-6. **M6 – Design-Feinschliff:** Schriften, Animationen, Dark Mode,
-   Accessibility-Durchgang, responsive Feinheiten.
-7. **M7 – Inhalte:** Karten- und Ideen-Datenbank auf Zielumfang füllen.
-8. **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` + Icons
-   (installierbar), nginx-Setup, optionale CI. **Release v1.0.**
-9. **M9 – Offline (v1.1):** Service Worker (Precache aller App-Assets +
+6. 🟡 **M6 – Design-Feinschliff:** Farbschema, Animationen, Dark Mode und
+   `prefers-reduced-motion` stehen. Offen: eigene Schriftart einbinden,
+   Feinschliff, formaler Accessibility-Durchgang / Lighthouse.
+7. 🟡 **M7 – Inhalte:** 12 Kategorien, ~200 Karten, 18 Spielideen (DE + EN)
+   vorhanden. Ziel: auf 20–30 Karten je Kategorie ausbauen, Ideen erweitern.
+8. 🟡 **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` + SVG-Icons und
+   `deploy/nginx.conf` stehen. Offen: gerasterte PNG-Icons (192/512),
+   optionale CI. Danach **Release v1.0.**
+9. ⬜ **M9 – Offline (v1.1):** Service Worker (Precache aller App-Assets +
    Daten), Update-Handling ("Neue Version verfügbar"), Offline-Test.
 
 ## 12. Ausblick (nach v1.1)
@@ -412,15 +435,16 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 
 ## 13. Getroffene Entscheidungen
 
-| Frage | Entscheidung |
-| --- | --- |
-| UI-Technologie | **Vanilla JS** (ES-Module, kein Framework), Rendering über kleine Helfer |
+| Frage             | Entscheidung                                                                                 |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| UI-Technologie    | **Vanilla JS** (ES-Module, kein Framework), Rendering über kleine Helfer                     |
 | Emoji-Darstellung | **Native Emojis in v1**; gekapselt in `renderEmoji()`, Twemoji später ohne Umbau nachrüstbar |
-| PWA | **Manifest + Icons in v1** (installierbar); **Service Worker / Offline in v1.1** |
-| Teilbare Ziehung | **In v1** – Ziehung im URL-Hash, "Ziehung teilen"-Button (FR-26 ff.) |
-| Sound-Effekte | **In v1** – dezente Töne, standardmäßig aus, opt-in-Toggle in localStorage (FR-30 ff.) |
+| PWA               | **Manifest + Icons in v1** (installierbar); **Service Worker / Offline in v1.1**             |
+| Teilbare Ziehung  | **In v1** – Ziehung im URL-Hash, "Ziehung teilen"-Button (FR-26 ff.)                         |
+| Sound-Effekte     | **In v1** – dezente Töne, standardmäßig aus, opt-in-Toggle in localStorage (FR-30 ff.)       |
 
 Noch offen / später zu klären:
+
 - Konkrete Schriftart (Nunito / Baloo 2 / Fredoka) – im Design-Meilenstein.
 - Dark Mode: nur `prefers-color-scheme` folgen oder zusätzlich manueller Toggle?
 - Genaue Kodierung des URL-Hash (lesbare IDs vs. kompakte Base64-Indizes).
