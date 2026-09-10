@@ -6,7 +6,7 @@
 // (language, sound, the per-slot categories); the drawn cards live in the URL
 // hash instead so draws are shareable (see sharing.js).
 
-const STORAGE_KEY = "emoji-cards:v1";
+const STORAGE_KEY = "storymoji:v1";
 
 /**
  * Read the persisted blob from localStorage. Always returns an object; missing

@@ -180,6 +180,10 @@ describe("app boot", () => {
       (n) => n.textContent
     );
     expect(enTerms).not.toEqual(deTerms);
-    expect(app.querySelector(".brand__title").textContent).toBe("Emoji Cards");
+    // brand name stays the same; the tagline is what changes
+    expect(app.querySelector(".brand__title").textContent).toBe("Storymoji");
+    expect(app.querySelector(".tagline").textContent).toMatch(
+      /make up a story/i
+    );
   });
 });

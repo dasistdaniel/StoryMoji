@@ -1,4 +1,4 @@
-/* Emoji Cards – styles
+/* Storymoji – styles
  * Colour tokens live on :root; only colours are re-declared for dark mode.
  * The card grid is CSS Grid; column counts adapt to the number of cards and
  * the viewport. Animations respect prefers-reduced-motion.

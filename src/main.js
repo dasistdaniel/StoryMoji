@@ -1,4 +1,4 @@
-// Emoji Cards – app entry point.
+// Storymoji – app entry point.
 //
 // Wires the pure logic modules (deck, i18n, prompts, sharing, sound) to the DOM.
 //

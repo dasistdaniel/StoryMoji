@@ -1,9 +1,11 @@
-# Emoji Cards 🎴
+# Storymoji 🎴
 
 A colourful, kid-friendly web app for making up stories – a digital take on
 "Story Cubes". Draw 1–6 cards, each showing an emoji and its word, and invent a
 story from them. The app also suggests play ideas
 ("Tell a superhero story using the things shown").
+
+Target deployment: <https://storymoji.nichtregistriert.de>
 
 - **No backend, no database** – a fully static site (`dist/`) served by any web
   server (nginx).
@@ -77,7 +79,7 @@ every card has a valid category and a term in every language.
 ## Deployment (nginx)
 
 1. `npm run build`
-2. Copy the contents of `dist/` to the web root, e.g. `/var/www/emoji-cards/`.
+2. Copy the contents of `dist/` to the web root, e.g. `/var/www/storymoji/`.
 3. Use the sample server block in [`deploy/nginx.conf`](./deploy/nginx.conf).
 
 Updating the site = uploading the new `dist/` files. There is nothing else to

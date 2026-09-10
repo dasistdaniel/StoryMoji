@@ -60,7 +60,7 @@ describe("createStore", () => {
   });
 
   it("survives corrupt storage", async () => {
-    backing.set("emoji-cards:v1", "{not json");
+    backing.set("storymoji:v1", "{not json");
     const { loadSettings } = await importFresh();
     expect(loadSettings()).toEqual({});
   });

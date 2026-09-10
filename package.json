@@ -1,7 +1,7 @@
 {
-  "name": "emoji-cards",
+  "name": "storymoji",
   "version": "0.1.0",
-  "description": "A colourful, kid-friendly web app for drawing emoji story cards.",
+  "description": "Storymoji – a colourful, kid-friendly web app for drawing emoji story cards.",
   "type": "module",
   "private": true,
   "scripts": {

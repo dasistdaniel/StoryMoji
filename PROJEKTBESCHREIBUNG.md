@@ -1,8 +1,8 @@
-# Emoji Cards – Projektbeschreibung
+# Storymoji – Projektbeschreibung
 
 ## 1. Zusammenfassung
 
-Emoji Cards ist eine kindgerechte, farbenfrohe Web-App als digitale Variante von
+Storymoji ist eine kindgerechte, farbenfrohe Web-App als digitale Variante von
 "Story Cubes". Der Nutzer zieht 1–6 Karten, jede Karte zeigt ein großes Emoji mit
 dem passenden Begriff darunter. Aus den gezogenen Karten denkt man sich gemeinsam
 eine Geschichte aus. Zusätzlich schlägt die App Spielideen vor
@@ -10,7 +10,8 @@ eine Geschichte aus. Zusätzlich schlägt die App Spielideen vor
 
 Die App ist eine reine statische Webseite (HTML/CSS/JS), ohne Backend, ohne
 Datenbank. Sie lässt sich durch simples Ausliefern der Dateien über einen
-nginx (oder jeden anderen Static-Host) betreiben.
+nginx (oder jeden anderen Static-Host) betreiben. Zieldomain (vorerst):
+`https://storymoji.nichtregistriert.de`.
 
 Zielgruppe: Eltern mit Kindern ab ca. 4 Jahren, Grundschule, Kita, Logopädie.
 Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
@@ -280,7 +281,7 @@ state = {
 }
 ```
 
-Persistiert in `localStorage` unter `emoji-cards:v1`: `language`, `soundEnabled`
+Persistiert in `localStorage` unter `storymoji:v1`: `language`, `soundEnabled`
 und `slotCategories` (nur die Kategorien, als Array). Die gezogenen Karten
 stehen ausschließlich im URL-Hash (pro Slot `<kategorie>,<karten-id>`, das Ganze
 base64url-kodiert als `#d=…`), damit Ziehungen teilbar, aber nicht direkt
@@ -309,7 +310,7 @@ Standardwerte (3 Slots × "Alle Kategorien").
 ### 6.6 Projektstruktur (Vorschlag)
 
 ```
-emoji-cards/
+storymoji/
 ├─ public/
 │  ├─ manifest.webmanifest
 │  ├─ icons/                # PWA-Icons
@@ -382,14 +383,14 @@ npm run preview  # lokale Vorschau des Builds
 ### Deployment auf nginx
 
 1. `npm run build`
-2. Inhalt von `dist/` nach `/var/www/emoji-cards/` kopieren (rsync/scp/CI).
+2. Inhalt von `dist/` nach `/var/www/storymoji/` kopieren (rsync/scp/CI).
 3. nginx Server-Block:
 
 ```nginx
 server {
     listen 80;
-    server_name emoji-cards.example.com;
-    root /var/www/emoji-cards;
+    server_name storymoji.nichtregistriert.de;
+    root /var/www/storymoji;
     index index.html;
 
     location / {
