@@ -17,6 +17,8 @@
   "card.redraw": "New card for {term}",
   "card.aria": "{term}, category {category}. Tap for a new card.",
   "card.category.aria": "Category for card {n}",
+  "card.pin": "Pin card {n}",
+  "card.unpin": "Unpin card {n}",
 
   "idea.title": "Play idea",
   "idea.close": "Close",

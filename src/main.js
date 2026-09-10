@@ -18,8 +18,8 @@ import {
   drawSlots,
   redrawSlot,
   reshuffleSlots,
+  reshuffleCategories,
   resizeSlots,
-  randomCategories,
   cardsByIds,
 } from "./deck.js";
 import { createStore, loadSettings } from "./store.js";
@@ -138,40 +138,51 @@ function commitSlots(slots, soundName) {
 
 // --- event handlers ----------------------------------------------------
 
-/** Tap a card: redraw it from its own slot category. */
+/** Whether a slot is frozen (its 📌 pin is on). */
+const isPinned = (slot) => Boolean(slot.pinned);
+
+/** Tap a card: redraw it from its own slot category (no-op while pinned). */
 function handleCardTap(index) {
   const { slots } = store.get();
+  if (slots[index].pinned) return;
   const next = slots.slice();
-  next[index] = {
-    category: next[index].category,
-    card: redrawSlot(CARDS, slots, index),
-  };
+  next[index] = { ...next[index], card: redrawSlot(CARDS, slots, index) };
   commitSlots(next, "redraw");
+}
+
+/** Toggle the 📌 pin that freezes a slot against the shuffle buttons. */
+function handleTogglePin(index) {
+  const { slots } = store.get();
+  const next = slots.slice();
+  next[index] = { ...next[index], pinned: !next[index].pinned };
+  store.set({ slots: next }); // pins are transient – not in the URL
 }
 
 /** Change one slot's category and draw a matching card for it. */
 function handleSlotCategory(index, value) {
   const category = normalizeCategory(value);
   const { slots } = store.get();
+  if (slots[index].pinned) return;
   const next = slots.slice();
-  next[index] = { category, card: next[index].card };
-  next[index] = { category, card: redrawSlot(CARDS, next, index) };
+  next[index] = { ...next[index], category };
+  next[index] = { ...next[index], card: redrawSlot(CARDS, next, index) };
   commitSlots(next, "draw");
 }
 
-/** Redraw every card from its own slot category. */
+/** Redraw every card from its own slot category (pinned slots stay). */
 function handleShuffle() {
-  commitSlots(reshuffleSlots(CARDS, store.get().slots), "shuffle");
+  commitSlots(reshuffleSlots(CARDS, store.get().slots, isPinned), "shuffle");
 }
 
-/** Assign a fresh random category to every slot and draw matching cards. */
+/** Assign a fresh random category to every slot (pinned slots stay). */
 function handleShuffleCategories() {
-  const count = store.get().slots.length;
-  const categories = randomCategories(
+  const next = reshuffleCategories(
+    CARDS,
+    store.get().slots,
     CATEGORIES.map((cat) => cat.id),
-    count
+    isPinned
   );
-  commitSlots(drawSlots(CARDS, categories), "shuffle");
+  commitSlots(next, "shuffle");
 }
 
 /** Change how many cards are on the table (existing slots are kept). */
@@ -244,29 +255,46 @@ function categoryOptions(selected) {
 function buildCard(slot, index) {
   const lang = store.get().language;
   const card = slot.card;
+  const pinned = Boolean(slot.pinned);
   const term = card ? card.term[lang] || card.term.de : "…";
+  const n = String(index + 1);
 
   const select = el(
     "select",
     {
       class: "card__cat",
-      "aria-label": t("card.category.aria", { n: String(index + 1) }),
+      disabled: pinned,
+      "aria-label": t("card.category.aria", { n }),
       onChange: (e) => handleSlotCategory(index, e.target.value),
     },
     categoryOptions(slot.category)
   );
   select.value = slot.category;
 
+  const pin = el(
+    "button",
+    {
+      class: "card__pin" + (pinned ? " is-pinned" : ""),
+      type: "button",
+      "aria-pressed": String(pinned),
+      "aria-label": t(pinned ? "card.unpin" : "card.pin", { n }),
+      title: t(pinned ? "card.unpin" : "card.pin", { n }),
+      onClick: () => handleTogglePin(index),
+    },
+    ["📌"]
+  );
+
   const face = el(
     "button",
     {
       class: "card__face",
       type: "button",
+      disabled: pinned,
       "aria-label": t("card.aria", {
         term,
         category: categoryLabel(card ? card.category : slot.category),
       }),
-      title: t("card.redraw", { term }),
+      title: pinned ? "" : t("card.redraw", { term }),
       onClick: () => handleCardTap(index),
     },
     [
@@ -281,11 +309,14 @@ function buildCard(slot, index) {
   return el(
     "div",
     {
-      class: "card" + (dealt ? " card--dealt" : ""),
+      class:
+        "card" +
+        (dealt ? " card--dealt" : "") +
+        (pinned ? " card--pinned" : ""),
       style: `--accent:${accentFor(slot)}`,
       role: "listitem",
     },
-    [select, face]
+    [el("div", { class: "card__top" }, [select, pin]), face]
   );
 }
 

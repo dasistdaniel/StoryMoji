@@ -92,21 +92,27 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   Karte für diesen Slot gezogen. Die anderen Karten bleiben unverändert.
 - FR-10a: Beim Nachziehen ("Karten mischen" oder Tap auf eine Karte) bleibt die
   pro Slot gewählte Kategorie erhalten. Nur "Kategorien mischen" ändert sie.
-- FR-11: Kategorien (Startumfang): Tiere, Gegenstände, Natur, Essen,
-  Menschen & Berufe, Orte, Fahrzeuge, Gefühle, Fantasie & Magie,
-  Wetter & Himmel, Sport & Freizeit, Symbole, Zahlen (0–9, feste 10er-Menge).
+- FR-10b: **Karte anpinnen (📌)** – ein Button an jeder Karte friert den Slot
+  ein: "Karten mischen" und "Kategorien mischen" lassen ihn unangetastet,
+  Kategorie-Dropdown und Tap-zum-Neuziehen sind deaktiviert (ein Ring + das
+  📌-Symbol zeigen den Zustand). Erneut tippen löst die Karte wieder. Pins sind
+  flüchtig – nicht im Link, nicht nach einem Reload.
+- FR-11: Kategorien (Startumfang, kurze Labels): Tiere, Gegenstände, Natur,
+  Essen, Menschen, Orte, Fahrzeuge, Gefühle, Fantasie, Wetter, Sport, Symbole,
+  Zahlen (0–9, feste 10er-Menge).
 - FR-12: Die pro Slot gewählten Kategorien werden lokal gespeichert (Array).
   Neue Slots (Anzahl erhöhen) übernehmen die Kategorie des letzten Slots.
 
 ### 4.4 Ziehen und Mischen
 
 - FR-13: Klick/Tap auf eine einzelne Karte ersetzt nur diese durch eine neue
-  zufällige Karte aus der Kategorie **dieses Slots**.
-- FR-14: Button "Karten mischen" zieht jede Karte neu – jeweils aus der Kategorie
-  ihres Slots (Slot-Kategorien bleiben).
-- FR-14a: Button "Kategorien mischen" weist jedem Slot eine neue zufällige
-  Kategorie zu (aus den echten Kategorien, nie "Alle Kategorien"; verschieden,
-  solange genug Kategorien da sind) und zieht dazu passende Karten.
+  zufällige Karte aus der Kategorie **dieses Slots** (außer die Karte ist
+  angepinnt, siehe FR-10b).
+- FR-14: Button "Karten mischen" zieht jede **nicht angepinnte** Karte neu –
+  jeweils aus der Kategorie ihres Slots (Slot-Kategorien bleiben).
+- FR-14a: Button "Kategorien mischen" weist jedem **nicht angepinnten** Slot eine
+  neue zufällige Kategorie zu (aus den echten Kategorien, nie "Alle Kategorien";
+  verschieden, solange genug Kategorien da sind) und zieht dazu passende Karten.
 - FR-15: Ziehen ist so weit wie möglich ohne Zurücklegen: keine Karte erscheint
   doppelt, solange die beteiligten Kategorien genug Einträge haben.
 - FR-16: Reichen die Karten einer Kategorie nicht (z. B. mehrere Slots derselben
@@ -274,8 +280,8 @@ state = {
   language: "de",          // localStorage
   soundEnabled: false,     // localStorage
   slots: [                 // aktuelle Ziehung
-    { category: "animals", card: <Card> },   // je Slot: eigene Kategorie + Karte
-    { category: "all",     card: <Card> },
+    { category: "animals", card: <Card>, pinned: false },  // je Slot: Kategorie
+    { category: "all",     card: <Card>, pinned: true  },  // + Karte + 📌-Status
     ...
   ]
 }
@@ -292,10 +298,10 @@ Standardwerte (3 Slots × "Alle Kategorien").
 
 - `store.js` – generischer Zustand (merge/subscribe) mit optionalem
   `persist(state)`-Serializer nach localStorage.
-- `deck.js` – reine Slot-Logik: `drawOne(cards, category, exclude)`,
-  `drawSlots(cards, categories)`, `redrawSlot(cards, slots, index)`,
-  `reshuffleSlots`, `resizeSlots`, `randomCategories(ids, count)`; nutzt
-  `crypto.getRandomValues` + Fisher-Yates.
+- `deck.js` – reine Slot-Logik: `drawOne`, `drawSlots`, `redrawSlot`,
+  `reshuffleSlots(cards, slots, keep?)`, `reshuffleCategories(…, keep?)`,
+  `resizeSlots`, `randomCategories`; das `keep`-Prädikat schützt angepinnte
+  Slots. Nutzt `crypto.getRandomValues` + Fisher-Yates.
 - `i18n.js` – `createTranslator(lang)` → `t(key, params)`, `{token}`-Ersetzung.
 - `prompts.js` – `randomPrompt()`, füllt `{card}`-Platzhalter aus der Hand.
 - `sharing.js` – Slots ↔ URL-Hash serialisieren/parsen, "Teilen"-Button

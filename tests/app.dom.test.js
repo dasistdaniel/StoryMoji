@@ -101,6 +101,39 @@ describe("app boot", () => {
     expect(dealt).toEqual([false, true, false]);
   });
 
+  it("a pinned card is frozen: shuffle skips it, its controls are disabled", async () => {
+    const app = await boot();
+    const termOf = (i) => app.querySelectorAll(".card__term")[i].textContent;
+    const pinnedTerm = termOf(1);
+
+    // pin the middle card
+    const pinBtn = app.querySelectorAll(".card__pin")[1];
+    pinBtn.click();
+
+    let card = app.querySelectorAll(".card")[1];
+    expect(card.classList.contains("card--pinned")).toBe(true);
+    expect(card.querySelector("select.card__cat").disabled).toBe(true);
+    expect(card.querySelector(".card__face").disabled).toBe(true);
+
+    // "Karten mischen" leaves the pinned card
+    app.querySelectorAll(".actions .btn")[0].click(); // primary = shuffle cards
+    expect(termOf(1)).toBe(pinnedTerm);
+
+    // "Kategorien mischen" also skips it
+    const catBefore = app.querySelectorAll("select.card__cat")[1].value;
+    [...app.querySelectorAll(".actions .btn")]
+      .find((b) => b.textContent.includes("Kategorien mischen"))
+      .click();
+    expect(app.querySelectorAll("select.card__cat")[1].value).toBe(catBefore);
+    expect(termOf(1)).toBe(pinnedTerm);
+
+    // unpin restores the controls
+    app.querySelectorAll(".card__pin")[1].click();
+    card = app.querySelectorAll(".card")[1];
+    expect(card.classList.contains("card--pinned")).toBe(false);
+    expect(card.querySelector(".card__face").disabled).toBe(false);
+  });
+
   it("'Kategorien mischen' assigns a fresh random category to every slot", async () => {
     const app = await boot();
     const before = [...app.querySelectorAll("select.card__cat")].map(

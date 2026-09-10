@@ -25,6 +25,7 @@ export const MAX_CARDS = 6;
  * @typedef {Object} Slot
  * @property {string} category category id this slot draws from ("all" allowed)
  * @property {Card} card the card currently shown in the slot
+ * @property {boolean} [pinned] when true the slot is frozen (shuffles skip it)
  */
 
 /**
@@ -136,18 +137,58 @@ export function randomCategories(categoryIds, count, rng) {
 
 /**
  * Redraw the card in every slot from its own category, keeping the hand as
- * distinct as the pools allow.
+ * distinct as the pools allow. Slots for which `keep(slot, i)` is true are
+ * returned unchanged and their cards are reserved so the redrawn ones avoid
+ * them (used to skip pinned slots).
  * @param {Card[]} cards full card list
  * @param {Slot[]} slots
+ * @param {(slot: Slot, index: number) => boolean} [keep]
  * @param {() => number} [rng]
  * @returns {Slot[]}
  */
-export function reshuffleSlots(cards, slots, rng) {
-  return drawSlots(
-    cards,
-    slots.map((slot) => slot.category),
-    rng
-  );
+export function reshuffleSlots(cards, slots, keep = () => false, rng) {
+  const used = new Set();
+  slots.forEach((slot, i) => {
+    if (keep(slot, i) && slot.card) used.add(slot.card.id);
+  });
+  return slots.map((slot, i) => {
+    if (keep(slot, i)) return slot;
+    const card = drawOne(cards, slot.category, used, rng);
+    if (card) used.add(card.id);
+    return { ...slot, card };
+  });
+}
+
+/**
+ * Assign a fresh random category to every slot (from `categoryIds`) and draw a
+ * matching card. Slots for which `keep(slot, i)` is true keep their category and
+ * card; their cards are reserved so the redrawn ones avoid them.
+ * @param {Card[]} cards full card list
+ * @param {Slot[]} slots
+ * @param {string[]} categoryIds real category ids to choose from
+ * @param {(slot: Slot, index: number) => boolean} [keep]
+ * @param {() => number} [rng]
+ * @returns {Slot[]}
+ */
+export function reshuffleCategories(
+  cards,
+  slots,
+  categoryIds,
+  keep = () => false,
+  rng
+) {
+  const fresh = randomCategories(categoryIds, slots.length, rng);
+  const used = new Set();
+  slots.forEach((slot, i) => {
+    if (keep(slot, i) && slot.card) used.add(slot.card.id);
+  });
+  return slots.map((slot, i) => {
+    if (keep(slot, i)) return slot;
+    const category = fresh[i];
+    const card = drawOne(cards, category, used, rng);
+    if (card) used.add(card.id);
+    return { category, card };
+  });
 }
 
 /**

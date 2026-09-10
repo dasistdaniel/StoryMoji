@@ -7,6 +7,7 @@ import {
   drawSlots,
   redrawSlot,
   reshuffleSlots,
+  reshuffleCategories,
   resizeSlots,
   randomCategories,
   cardsByIds,
@@ -160,13 +161,44 @@ describe("randomCategories", () => {
 });
 
 describe("reshuffleSlots", () => {
+  const cards = makeCards({ animals: 10, food: 10 });
+
   it("redraws every slot from its own category", () => {
-    const cards = makeCards({ animals: 10, food: 10 });
     const slots = drawSlots(cards, ["animals", "food", "food"]);
     const next = reshuffleSlots(cards, slots);
     expect(next.map((s) => s.category)).toEqual(["animals", "food", "food"]);
     expect(next[0].card.category).toBe("animals");
     expect(next[1].card.category).toBe("food");
+  });
+
+  it("keeps slots the `keep` predicate protects, and avoids their cards", () => {
+    const slots = drawSlots(cards, Array(4).fill("animals"));
+    const pinnedId = slots[1].card.id;
+    const next = reshuffleSlots(cards, slots, (_, i) => i === 1);
+    expect(next[1]).toBe(slots[1]); // untouched
+    const others = next.filter((_, i) => i !== 1).map((s) => s.card.id);
+    expect(others).not.toContain(pinnedId); // redrawn cards avoid the kept one
+  });
+});
+
+describe("reshuffleCategories", () => {
+  const cards = makeCards({ a: 8, b: 8, c: 8, d: 8 });
+  const ids = ["a", "b", "c", "d"];
+
+  it("gives every slot a fresh category and a matching card", () => {
+    const slots = drawSlots(cards, ["a", "a", "a"]);
+    const next = reshuffleCategories(cards, slots, ids);
+    expect(next).toHaveLength(3);
+    for (const slot of next) {
+      expect(ids).toContain(slot.category);
+      expect(slot.card.category).toBe(slot.category);
+    }
+  });
+
+  it("leaves protected slots (category + card) alone", () => {
+    const slots = drawSlots(cards, ["a", "b", "c"]);
+    const next = reshuffleCategories(cards, slots, ids, (_, i) => i === 0);
+    expect(next[0]).toBe(slots[0]);
   });
 });
 
