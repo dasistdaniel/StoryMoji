@@ -1,0 +1,13 @@
+services:
+  storymoji:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    image: storymoji:latest
+    container_name: storymoji
+    # Use Docker's built-in default bridge instead of a per-project network
+    # (the host has many compose stacks and its address pool is exhausted).
+    network_mode: bridge
+    ports:
+      - "7044:80"
+    restart: unless-stopped

@@ -76,14 +76,32 @@ Edit `src/data/cards.json` and `src/data/prompts.json` to change cards and play
 ideas – no code changes needed. Run `npm run check:data` afterwards; it verifies
 every card has a valid category and a term in every language.
 
-## Deployment (nginx)
+## Deployment
+
+### Plain nginx
 
 1. `npm run build`
 2. Copy the contents of `dist/` to the web root, e.g. `/var/www/storymoji/`.
 3. Use the sample server block in [`deploy/nginx.conf`](./deploy/nginx.conf).
 
-Updating the site = uploading the new `dist/` files. There is nothing else to
-run.
+Updating the site = uploading the new `dist/` files.
+
+### Docker (nginx container)
+
+```bash
+docker compose up -d --build      # builds the site + serves it on :7044
+```
+
+- [`deploy/Dockerfile`](./deploy/Dockerfile) – multi-stage: `node` builds,
+  `nginx:alpine` serves `dist/`.
+- [`deploy/nginx.docker.conf`](./deploy/nginx.docker.conf) – in-container nginx.
+- [`docker-compose.yml`](./docker-compose.yml) – host port `7044` → container
+  `80`, `restart: unless-stopped`, uses Docker's default bridge network.
+
+To update: re-run `docker compose up -d --build`.
+
+Current instance: `http://<lan-ip-redacted>:7044/` (container `storymoji`,
+project dir `/home/daniel/storymoji`).
 
 ## Roadmap
 
