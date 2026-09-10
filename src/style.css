@@ -313,6 +313,43 @@ body {
   cursor: default;
 }
 
+/* --- reveal mode: face-down card ------------------------------------- */
+
+.card__face--covered {
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--accent) 12%, transparent),
+    color-mix(in srgb, var(--accent) 12%, transparent) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.card__back {
+  font-size: clamp(2.6rem, 42cqw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent, var(--ink-soft));
+  opacity: 0.9;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Card that was face-down last render and is open now flips in. */
+.card--flip .card__face {
+  animation: flip-in 0.34s ease both;
+}
+
+@keyframes flip-in {
+  from {
+    transform: perspective(700px) rotateY(-88deg);
+    opacity: 0.2;
+  }
+  to {
+    transform: perspective(700px) rotateY(0);
+    opacity: 1;
+  }
+}
+
 .card .emoji {
   font-size: clamp(2.2rem, 38cqw, 4.6rem);
   line-height: 1;
@@ -554,12 +591,12 @@ body {
 }
 
 .icon-btn {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 999px;
   border: 2px solid var(--line);
   background: var(--bg-2);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   cursor: pointer;
   display: grid;
   place-items: center;

@@ -76,12 +76,14 @@ const store = createStore(
         typeof navigator !== "undefined" ? navigator.languages : []
       ),
     soundEnabled: Boolean(saved.soundEnabled),
+    revealMode: Boolean(saved.revealMode),
     slots: [],
   },
   {
     persist: (s) => ({
       language: s.language,
       soundEnabled: s.soundEnabled,
+      revealMode: s.revealMode,
       slotCategories: s.slots.map((slot) => slot.category),
     }),
   }
@@ -89,7 +91,10 @@ const store = createStore(
 
 const fromUrl = readDrawFromUrl();
 if (fromUrl && fromUrl.length) {
-  store.set({ slots: slotsFromPairs(fromUrl) });
+  // A shared link is meant to be seen – restore its cards face-up.
+  store.set({
+    slots: slotsFromPairs(fromUrl).map((s) => ({ ...s, revealed: true })),
+  });
 } else {
   const savedCats =
     Array.isArray(saved.slotCategories) && saved.slotCategories.length
@@ -113,6 +118,7 @@ let currentPrompt = null;
 // animate the cards / idea panel that actually changed.
 let prevCardIds = [];
 let prevPromptId = null;
+let prevCovered = [];
 
 function categoryLabel(id) {
   if (id === ALL_CATEGORIES) return t("controls.category.all");
@@ -141,12 +147,41 @@ function commitSlots(slots, soundName) {
 /** Whether a slot is frozen (its 📌 pin is on). */
 const isPinned = (slot) => Boolean(slot.pinned);
 
-/** Tap a card: redraw it from its own slot category (no-op while pinned). */
+/** Whether a slot is currently face-down (reveal mode on and not yet revealed). */
+function isCovered(slot) {
+  return store.get().revealMode && !slot.revealed;
+}
+
+/**
+ * In reveal mode, turn freshly drawn slots face-down (pinned ones keep whatever
+ * state they had). Outside reveal mode this is a no-op.
+ */
+function coverFresh(slots) {
+  if (!store.get().revealMode) return slots;
+  return slots.map((s) => (s.pinned ? s : { ...s, revealed: false }));
+}
+
+/**
+ * Tap a card: in reveal mode a face-down card flips open; otherwise (or once
+ * open) it redraws from its own slot category. No-op while pinned.
+ */
 function handleCardTap(index) {
   const { slots } = store.get();
-  if (slots[index].pinned) return;
+  const slot = slots[index];
+  if (slot.pinned) return;
+
   const next = slots.slice();
-  next[index] = { ...next[index], card: redrawSlot(CARDS, slots, index) };
+  if (isCovered(slot)) {
+    next[index] = { ...slot, revealed: true };
+    store.set({ slots: next }); // reveal state is transient – not in the URL
+    sound.play("redraw");
+    return;
+  }
+  next[index] = {
+    ...slot,
+    card: redrawSlot(CARDS, slots, index),
+    revealed: true,
+  };
   commitSlots(next, "redraw");
 }
 
@@ -158,6 +193,15 @@ function handleTogglePin(index) {
   store.set({ slots: next }); // pins are transient – not in the URL
 }
 
+/** Toggle reveal mode; turning it on never hides what is already on screen. */
+function handleToggleRevealMode() {
+  const revealMode = !store.get().revealMode;
+  const slots = revealMode
+    ? store.get().slots.map((s) => ({ ...s, revealed: true }))
+    : store.get().slots;
+  store.set({ revealMode, slots });
+}
+
 /** Change one slot's category and draw a matching card for it. */
 function handleSlotCategory(index, value) {
   const category = normalizeCategory(value);
@@ -165,22 +209,29 @@ function handleSlotCategory(index, value) {
   if (slots[index].pinned) return;
   const next = slots.slice();
   next[index] = { ...next[index], category };
-  next[index] = { ...next[index], card: redrawSlot(CARDS, next, index) };
+  next[index] = {
+    ...next[index],
+    card: redrawSlot(CARDS, next, index),
+    revealed: true,
+  };
   commitSlots(next, "draw");
 }
 
 /** Redraw every card from its own slot category (pinned slots stay). */
 function handleShuffle() {
-  commitSlots(reshuffleSlots(CARDS, store.get().slots, isPinned), "shuffle");
+  const next = coverFresh(reshuffleSlots(CARDS, store.get().slots, isPinned));
+  commitSlots(next, "shuffle");
 }
 
 /** Assign a fresh random category to every slot (pinned slots stay). */
 function handleShuffleCategories() {
-  const next = reshuffleCategories(
-    CARDS,
-    store.get().slots,
-    CATEGORIES.map((cat) => cat.id),
-    isPinned
+  const next = coverFresh(
+    reshuffleCategories(
+      CARDS,
+      store.get().slots,
+      CATEGORIES.map((cat) => cat.id),
+      isPinned
+    )
   );
   commitSlots(next, "shuffle");
 }
@@ -256,6 +307,7 @@ function buildCard(slot, index) {
   const lang = store.get().language;
   const card = slot.card;
   const pinned = Boolean(slot.pinned);
+  const covered = isCovered(slot);
   const term = card ? card.term[lang] || card.term.de : "…";
   const n = String(index + 1);
 
@@ -287,24 +339,30 @@ function buildCard(slot, index) {
   const face = el(
     "button",
     {
-      class: "card__face",
+      class: "card__face" + (covered ? " card__face--covered" : ""),
       type: "button",
       disabled: pinned,
-      "aria-label": t("card.aria", {
-        term,
-        category: categoryLabel(card ? card.category : slot.category),
-      }),
-      title: pinned ? "" : t("card.redraw", { term }),
+      "aria-label": covered
+        ? t("card.covered", { n })
+        : t("card.aria", {
+            term,
+            category: categoryLabel(card ? card.category : slot.category),
+          }),
+      title: pinned || covered ? "" : t("card.redraw", { term }),
       onClick: () => handleCardTap(index),
     },
-    [
-      renderEmoji(card ? card.emoji : "❓"),
-      el("span", { class: "card__term" }, [term]),
-    ]
+    covered
+      ? [el("span", { class: "card__back", "aria-hidden": "true" }, ["?"])]
+      : [
+          renderEmoji(card ? card.emoji : "❓"),
+          el("span", { class: "card__term" }, [term]),
+        ]
   );
 
   // Only newly dealt cards get the pop animation (see prevCardIds).
   const dealt = card && prevCardIds[index] !== card.id;
+  // A card that was face-down last render and is open now flips in.
+  const flipped = prevCovered[index] && !covered;
 
   return el(
     "div",
@@ -312,7 +370,9 @@ function buildCard(slot, index) {
       class:
         "card" +
         (dealt ? " card--dealt" : "") +
-        (pinned ? " card--pinned" : ""),
+        (pinned ? " card--pinned" : "") +
+        (covered ? " card--covered" : "") +
+        (flipped ? " card--flip" : ""),
       style: `--accent:${accentFor(slot)}`,
       role: "listitem",
     },
@@ -389,7 +449,7 @@ function buildActions() {
 }
 
 function buildTopBar() {
-  const { language, soundEnabled } = store.get();
+  const { language, soundEnabled, revealMode } = store.get();
   const langToggle = el(
     "div",
     { class: "segmented", role: "group", "aria-label": t("controls.language") },
@@ -421,12 +481,27 @@ function buildTopBar() {
     [soundEnabled ? "🔊" : "🔈"]
   );
 
+  const revealBtn = el(
+    "button",
+    {
+      class: "icon-btn" + (revealMode ? " is-active" : ""),
+      type: "button",
+      "aria-pressed": String(revealMode),
+      "aria-label": revealMode
+        ? t("controls.reveal.on")
+        : t("controls.reveal.off"),
+      title: revealMode ? t("controls.reveal.on") : t("controls.reveal.off"),
+      onClick: handleToggleRevealMode,
+    },
+    ["🃏"]
+  );
+
   return el("header", { class: "topbar" }, [
     el("div", { class: "brand" }, [
       el("span", { class: "brand__mark", "aria-hidden": "true" }, ["🎴"]),
       el("h1", { class: "brand__title" }, [t("app.title")]),
     ]),
-    el("div", { class: "topbar__tools" }, [soundBtn, langToggle]),
+    el("div", { class: "topbar__tools" }, [revealBtn, soundBtn, langToggle]),
   ]);
 }
 
@@ -508,6 +583,7 @@ function render() {
 
   // Snapshot what we just drew so the next render only animates real changes.
   prevCardIds = store.get().slots.map((slot) => slot.card?.id);
+  prevCovered = store.get().slots.map(isCovered);
   prevPromptId = currentPrompt?.id ?? null;
 }
 
@@ -516,7 +592,9 @@ function render() {
 window.addEventListener("hashchange", () => {
   const pairs = readDrawFromUrl();
   if (!pairs || !pairs.length) return;
-  store.set({ slots: slotsFromPairs(pairs) });
+  store.set({
+    slots: slotsFromPairs(pairs).map((s) => ({ ...s, revealed: true })),
+  });
   // Normalise a legacy readable link to the obfuscated form.
   syncUrl();
 });

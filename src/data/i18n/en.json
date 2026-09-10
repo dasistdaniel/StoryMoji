@@ -13,12 +13,15 @@
   "controls.language": "Language",
   "controls.sound.on": "Sound on",
   "controls.sound.off": "Sound off",
+  "controls.reveal.on": "Reveal mode on",
+  "controls.reveal.off": "Reveal mode off",
 
   "card.redraw": "New card for {term}",
   "card.aria": "{term}, category {category}. Tap for a new card.",
   "card.category.aria": "Category for card {n}",
   "card.pin": "Pin card {n}",
   "card.unpin": "Unpin card {n}",
+  "card.covered": "Hidden card {n} – tap to reveal",
 
   "idea.title": "Play idea",
   "idea.close": "Close",

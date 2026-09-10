@@ -119,6 +119,21 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   kleinen Kategorie), dürfen sich Karten wiederholen.
 - FR-17: Zufall über `crypto.getRandomValues` (Fisher-Yates-Shuffle).
 
+### 4.4a Aufdeck-Modus (zuschaltbar)
+
+- FR-17a: Ein Toggle (🃏) in der Kopfleiste schaltet den **Aufdeck-Modus** ein
+  bzw. aus; die Wahl wird lokal gespeichert.
+- FR-17b: Im Aufdeck-Modus werden frisch gezogene Karten **verdeckt** dargestellt
+  (Kartenrücken mit "?"). Ein Tap deckt genau diese eine Karte auf (kurze
+  Flip-Animation). Ist die Karte aufgedeckt, wirkt der Tap wie sonst (neu ziehen,
+  FR-13).
+- FR-17c: "Karten mischen" / "Kategorien mischen" / neue Slots (Anzahl erhöhen)
+  legen die betroffenen Karten wieder verdeckt hin. Angepinnte Karten bleiben
+  sichtbar. Das Einschalten des Modus verdeckt nichts, was schon auf dem Tisch
+  liegt; eine über einen Link geöffnete Ziehung ist immer aufgedeckt.
+- FR-17d: Der Aufdeck-Status pro Karte ist flüchtig (nicht im Link, nicht nach
+  Reload).
+
 ### 4.5 Spielideen / Vorschläge
 
 - FR-18: Button "Spielidee" zeigt einen zufälligen Prompt aus einer Liste.
@@ -279,16 +294,18 @@ Zustand zwischen Nutzern, daher kein Server, keine DB.
 state = {
   language: "de",          // localStorage
   soundEnabled: false,     // localStorage
+  revealMode: false,       // localStorage
   slots: [                 // aktuelle Ziehung
-    { category: "animals", card: <Card>, pinned: false },  // je Slot: Kategorie
-    { category: "all",     card: <Card>, pinned: true  },  // + Karte + 📌-Status
-    ...
+    { category: "animals", card: <Card>, pinned: false, revealed: true },
+    { category: "all",     card: <Card>, pinned: true,  revealed: true },
+    ...   // je Slot: Kategorie + Karte + 📌-Status + Aufdeck-Status
   ]
 }
 ```
 
-Persistiert in `localStorage` unter `storymoji:v1`: `language`, `soundEnabled`
-und `slotCategories` (nur die Kategorien, als Array). Die gezogenen Karten
+Persistiert in `localStorage` unter `storymoji:v1`: `language`, `soundEnabled`,
+`revealMode` und `slotCategories` (nur die Kategorien, als Array). `pinned` und
+`revealed` pro Slot sind flüchtig. Die gezogenen Karten
 stehen ausschließlich im URL-Hash (pro Slot `<kategorie>,<karten-id>`, das Ganze
 base64url-kodiert als `#d=…`), damit Ziehungen teilbar, aber nicht direkt
 ablesbar sind. Beim Laden gilt: Hash schlägt localStorage, localStorage schlägt

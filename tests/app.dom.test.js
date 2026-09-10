@@ -134,6 +134,36 @@ describe("app boot", () => {
     expect(card.querySelector(".card__face").disabled).toBe(false);
   });
 
+  it("reveal mode: cards are dealt face-down and flip open on tap", async () => {
+    const app = await boot();
+    const revealBtn = [...app.querySelectorAll(".icon-btn")].find(
+      (b) => b.textContent === "🃏"
+    );
+
+    // turning it on does not hide what is already on screen
+    revealBtn.click();
+    expect(app.querySelectorAll(".card--covered")).toHaveLength(0);
+
+    // the next shuffle deals face-down
+    app.querySelectorAll(".actions .btn")[0].click(); // shuffle cards
+    expect(app.querySelectorAll(".card--covered")).toHaveLength(3);
+    expect(app.querySelectorAll(".card__face .emoji")).toHaveLength(0);
+
+    // tapping a covered card reveals just it
+    app.querySelectorAll(".card__face")[1].click();
+    const covered = [...app.querySelectorAll(".card")].map((c) =>
+      c.classList.contains("card--covered")
+    );
+    expect(covered).toEqual([true, false, true]);
+    expect(
+      app.querySelectorAll(".card")[1].querySelector(".emoji")
+    ).not.toBeNull();
+
+    // turning the mode off shows everything
+    revealBtn.click();
+    expect(app.querySelectorAll(".card--covered")).toHaveLength(0);
+  });
+
   it("'Kategorien mischen' assigns a fresh random category to every slot", async () => {
     const app = await boot();
     const before = [...app.querySelectorAll("select.card__cat")].map(
