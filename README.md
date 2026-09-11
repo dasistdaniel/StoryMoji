@@ -12,7 +12,10 @@ Target deployment: <https://storymoji.nichtregistriert.de>
 - **Bilingual** – German (primary) and English, switchable without a reload.
 - **Offline-friendly** – installable via a web app manifest (full offline
   support planned for v1.1).
-- **Private** – only `localStorage` for settings, no tracking, no accounts.
+- **Private / GDPR-friendly** – no cookies, no tracking, no third-party
+  requests; only `localStorage` for settings; access logs are IP-anonymised.
+  See [`public/datenschutz.html`](./public/datenschutz.html) (privacy policy –
+  **fill in the controller/contact placeholders before going live**).
 
 See [`PROJEKTBESCHREIBUNG.md`](./PROJEKTBESCHREIBUNG.md) for the full concept and
 requirements (in German).

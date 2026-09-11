@@ -249,4 +249,11 @@ describe("app boot", () => {
       /make up a story/i
     );
   });
+
+  it("footer links to the static privacy policy page", async () => {
+    const app = await boot();
+    const link = app.querySelector(".footer .footer__link");
+    expect(link).not.toBeNull();
+    expect(link.getAttribute("href")).toBe("./datenschutz.html");
+  });
 });

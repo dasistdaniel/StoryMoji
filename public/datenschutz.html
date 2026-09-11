@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <title>Datenschutz – Storymoji</title>
+    <style>
+      :root {
+        --bg: #fff6ec;
+        --bg-2: #ffffff;
+        --ink: #2b2340;
+        --ink-soft: #6a6482;
+        --line: #eadfce;
+        --accent-brand: #4cc9f0;
+        --primary: #ff5d8f;
+        --radius: 18px;
+        --shadow-sm: 0 4px 10px rgba(43, 35, 64, 0.1);
+        --font:
+          "Nunito", "Baloo 2", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1c1830;
+          --bg-2: #262040;
+          --ink: #f4f1ff;
+          --ink-soft: #b3abd4;
+          --line: #3a3358;
+          --primary: #ff7aa8;
+          --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: clamp(1.25rem, 4vw, 2.5rem);
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: var(--ink-soft);
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .back:hover {
+        color: var(--primary);
+      }
+      h1 {
+        font-size: clamp(1.6rem, 4vw, 2.1rem);
+        margin: 0 0 0.25rem;
+      }
+      .lead {
+        color: var(--ink-soft);
+        font-weight: 600;
+        margin: 0 0 2rem;
+      }
+      section {
+        background: var(--bg-2);
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        margin-bottom: 1rem;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 0 0 0.6rem;
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 1rem 0 0.4rem;
+      }
+      p,
+      ul {
+        margin: 0.5rem 0;
+      }
+      ul {
+        padding-left: 1.3rem;
+      }
+      code {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 0.05rem 0.35rem;
+        font-size: 0.92em;
+      }
+      .placeholder {
+        color: var(--primary);
+        font-weight: 700;
+      }
+      .lang-divider {
+        text-align: center;
+        color: var(--ink-soft);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.85rem;
+        margin: 2.5rem 0 1.5rem;
+      }
+      footer {
+        color: var(--ink-soft);
+        font-size: 0.85rem;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="back" href="./">← Zurück zu Storymoji</a>
+
+      <h1>Datenschutzerklärung</h1>
+      <p class="lead">
+        Kurz gesagt: Storymoji speichert nichts über dich auf einem Server. Es
+        gibt kein Konto, kein Tracking, keine Cookies, keine Werbung.
+      </p>
+
+      <section>
+        <h2>1. Verantwortlicher</h2>
+        <p>
+          <span class="placeholder">[Name / Betreiber ausfüllen]</span><br />
+          <span class="placeholder">[Anschrift ausfüllen]</span><br />
+          E-Mail:
+          <span class="placeholder">[Kontakt-E-Mail ausfüllen]</span>
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Zusammenfassung</h2>
+        <ul>
+          <li>
+            Storymoji läuft vollständig im Browser – es gibt kein Konto, kein
+            Login und keine Registrierung.
+          </li>
+          <li>
+            Es werden <strong>keine Cookies</strong> gesetzt und
+            <strong>keine</strong> Analyse-, Tracking- oder Werbedienste
+            eingebunden.
+          </li>
+          <li>
+            Alle Schriften, Icons und Skripte werden selbst gehostet – es werden
+            keine Daten an Drittanbieter (z. B. Google Fonts) gesendet.
+          </li>
+          <li>
+            Es werden nur technisch notwendige Einstellungen lokal auf
+            <em>deinem</em> Gerät gespeichert (Abschnitt 3) – sie verlassen dein
+            Gerät nie.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Lokale Speicherung im Browser (localStorage)</h2>
+        <p>
+          Dein Browser speichert unter dem Schlüssel
+          <code>storymoji:v1</code> ausschließlich folgende Einstellungen –
+          lokal auf deinem Gerät, niemals an einen Server übertragen:
+        </p>
+        <ul>
+          <li>gewählte Sprache (Deutsch/Englisch)</li>
+          <li>Ton an/aus</li>
+          <li>Aufdeck-Modus an/aus</li>
+          <li>zuletzt gewählte Kartenkategorien</li>
+        </ul>
+        <p>
+          Hierbei handelt es sich nicht um personenbezogene Daten im
+          eigentlichen Sinne. Soweit die DSGVO dennoch anwendbar ist, erfolgt
+          die Verarbeitung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+          (berechtigtes Interesse an einer funktionierenden, deine Einstellungen
+          merkenden App). Du kannst diese Daten jederzeit über die Einstellungen
+          deines Browsers löschen (z. B. „Website-Daten löschen“ / „Browserdaten
+          löschen“).
+        </p>
+        <p>
+          Wenn du eine Kartenziehung über „Ziehung teilen“ teilst, wird die
+          Auswahl in den Link selbst kodiert (verschleiert, kein Klartext). Auch
+          das verlässt deinen Browser nur, wenn du den Link aktiv teilst.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Server-Logdateien</h2>
+        <p>
+          Beim Aufruf der Seite verarbeitet der Webserver automatisch technische
+          Verbindungsdaten (Server-Logfiles): anonymisierte IP-Adresse,
+          Datum/Uhrzeit des Zugriffs, aufgerufene Seite, verwendeter Browser.
+          Die IP-Adresse wird dabei serverseitig gekürzt (beim letzten Oktett
+          bzw. bei IPv6 im letzten Teil entfernt) und nicht mit anderen Daten
+          zusammengeführt.
+        </p>
+        <p>
+          Dies dient ausschließlich der Systemsicherheit und -stabilität (Art. 6
+          Abs. 1 lit. f DSGVO – berechtigtes Interesse an einem
+          funktionierenden, sicheren Betrieb). Die Logs werden nach kurzer Zeit
+          automatisch gelöscht.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Cookies</h2>
+        <p>
+          Diese Seite verwendet keine Cookies. Ein Cookie-Banner ist daher nicht
+          erforderlich.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Keine Weitergabe an Dritte</h2>
+        <p>
+          Es findet keine Übermittlung von Daten an Dritte statt. Es werden
+          keine externen Dienste (z. B. Google Fonts, Analytics-Tools,
+          Werbenetzwerke, Social-Media-Plugins) eingebunden.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. Hosting</h2>
+        <p>
+          Diese App wird auf
+          <span class="placeholder"
+            >[eigener / selbst verwalteter Infrastruktur – ggf. Hosting-Anbieter
+            ergänzen]</span
+          >
+          betrieben.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Deine Rechte</h2>
+        <p>
+          Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung
+          der Verarbeitung, Datenübertragbarkeit sowie Widerspruch (Art. 15–21
+          DSGVO). Da praktisch keine personenbezogenen Daten serverseitig
+          gespeichert werden, laufen diese Rechte in der Praxis meist leer. Bei
+          Fragen wende dich gerne an die E-Mail-Adresse in Abschnitt 1. Du hast
+          außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu
+          beschweren.
+        </p>
+      </section>
+
+      <p class="lead" style="margin-top: 2rem">
+        Stand: <span class="placeholder">[Datum einsetzen]</span>
+      </p>
+
+      <div class="lang-divider">English</div>
+
+      <section>
+        <h2>Privacy Policy (summary)</h2>
+        <p>
+          Storymoji runs entirely in your browser. There is no account, no
+          login, and no cookies. No analytics, tracking, or advertising services
+          are embedded, and no third-party fonts, icons, or scripts are loaded –
+          everything is self-hosted.
+        </p>
+        <h3>Local storage</h3>
+        <p>
+          Your browser stores your language, sound, reveal-mode and category
+          preferences locally under the key <code>storymoji:v1</code>. This data
+          never leaves your device unless you explicitly share a draw (its cards
+          are encoded into the link you choose to share). You can clear it any
+          time via your browser's site-data settings.
+        </p>
+        <h3>Server logs</h3>
+        <p>
+          The web server automatically processes technical connection data (an
+          anonymised IP address, timestamp, requested page, browser) for
+          security and stability purposes. Logs are deleted after a short
+          retention period.
+        </p>
+        <h3>Your rights</h3>
+        <p>
+          You have the right to access, rectify, erase, restrict, or port your
+          data, and to object to its processing, under Art. 15–21 GDPR. Contact:
+          <span class="placeholder">[contact email]</span>. You may also lodge a
+          complaint with a data protection authority.
+        </p>
+      </section>
+
+      <footer>
+        <a class="back" href="./">← Zurück zu Storymoji / Back to Storymoji</a>
+      </footer>
+    </div>
+  </body>
+</html>

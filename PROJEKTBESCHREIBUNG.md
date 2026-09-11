@@ -205,8 +205,9 @@ Primärer Anwendungsfall: Vater/Mutter + Kind (6 Jahre) am Handy oder PC.
   ARIA-Labels für Karten und Buttons, `prefers-reduced-motion` respektiert.
 - NFR-7: Kein externes Tracking, keine Drittanbieter-Requests zur Laufzeit
   (Fonts und alle Assets selbst gehostet).
-- NFR-8: Datenschutz: Nur `localStorage` für Einstellungen, keine personen-
-  bezogenen Daten.
+- NFR-8: **DSGVO-konform** (siehe §10a): Nur `localStorage` für Einstellungen,
+  keine Cookies, kein Tracking; Server-Logs mit anonymisierter IP; eigene
+  Datenschutzerklärung (`public/datenschutz.html`), im Footer verlinkt.
 - NFR-9: Code auf Englisch, sinnvoll kommentiert, konsistent formatiert
   (Prettier/ESLint).
 - NFR-10: Inhalte (Karten, Ideen, Übersetzungen) in getrennten Datendateien,
@@ -459,6 +460,40 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
   `sound.js` (kein Ton bei `soundEnabled = false`).
 - Datencheck-Skript: prüft, dass jede Karte eine gültige Kategorie hat und
   in allen Sprachen einen Begriff besitzt.
+
+## 10a. Datenschutz (DSGVO)
+
+Die App verarbeitet bewusst so wenig wie möglich – das war schon vor dieser
+Umsetzung durch das statische, backend-lose Konzept weitgehend gegeben:
+
+- **Keine Cookies, kein Tracking, keine Drittanbieter.** Keine Analyse- oder
+  Werbedienste, keine Google Fonts/CDNs – alle Schriften, Icons und Skripte
+  sind selbst gehostet (NFR-7). Da keine Cookies gesetzt werden, ist kein
+  Cookie-Consent-Banner nötig.
+- **localStorage** (`storymoji:v1`) enthält nur Sprache, Ton, Aufdeck-Modus
+  und die zuletzt gewählten Kategorien – rein lokal im Browser, nie an einen
+  Server übertragen. Rechtsgrundlage, soweit einschlägig: Art. 6 Abs. 1 lit. f
+  DSGVO (berechtigtes Interesse an einer funktionierenden App).
+- **Geteilte Ziehungen**: Die Kartenauswahl steckt verschleiert im Link selbst
+  (`#d=…`, base64url) und verlässt den Browser nur, wenn aktiv geteilt wird
+  (siehe FR-26a).
+- **Server-Logs**: nginx protokolliert eine **anonymisierte IP-Adresse**
+  (letztes IPv4-Oktett bzw. letzter IPv6-Block entfernt) statt der vollen
+  Adresse – umgesetzt per `map`/`log_format` in `deploy/nginx.conf` und
+  `deploy/nginx.docker.conf`. Zweck: Systemsicherheit/-stabilität
+  (Art. 6 Abs. 1 lit. f DSGVO), kurze Aufbewahrung.
+- **Datenschutzerklärung**: `public/datenschutz.html` (deutsch, mit
+  englischer Zusammenfassung) – eine eigenständige, im Footer verlinkte
+  Seite, damit sie auch ohne die App-JS-Bundle funktioniert. Enthält
+  Platzhalter für Verantwortlichen/Kontakt, die noch auszufüllen sind.
+- **Impressum**: `public/impressum.html` als Platzhalter-Vorlage beigelegt.
+  Ob eine Impressumspflicht (§ 5 TMG) für ein rein privates,
+  nicht-kommerzielles Projekt greift, ist rechtlich nicht immer eindeutig –
+  im Zweifel anwaltlich prüfen lassen; die Vorlage liegt bereit, falls ja.
+
+**Noch offen (nicht automatisierbar, erfordert echte Angaben):** Name/Anschrift
+/Kontakt-E-Mail in `datenschutz.html` und `impressum.html` eintragen, Datum
+setzen.
 
 ## 11. Meilensteine
 

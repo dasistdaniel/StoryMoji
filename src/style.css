@@ -615,6 +615,25 @@ body {
   font-weight: 600;
   font-size: 0.9rem;
   padding-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.footer__sep {
+  opacity: 0.6;
+}
+
+.footer__link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer__link:hover {
+  color: var(--primary);
 }
 
 /* --- a11y utilities -------------------------------------------- */

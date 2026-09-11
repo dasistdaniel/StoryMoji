@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <title>Impressum – Storymoji</title>
+    <style>
+      :root {
+        --bg: #fff6ec;
+        --bg-2: #ffffff;
+        --ink: #2b2340;
+        --ink-soft: #6a6482;
+        --line: #eadfce;
+        --primary: #ff5d8f;
+        --radius: 18px;
+        --shadow-sm: 0 4px 10px rgba(43, 35, 64, 0.1);
+        --font:
+          "Nunito", "Baloo 2", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1c1830;
+          --bg-2: #262040;
+          --ink: #f4f1ff;
+          --ink-soft: #b3abd4;
+          --line: #3a3358;
+          --primary: #ff7aa8;
+          --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: clamp(1.25rem, 4vw, 2.5rem);
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: var(--ink-soft);
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .back:hover {
+        color: var(--primary);
+      }
+      h1 {
+        font-size: clamp(1.6rem, 4vw, 2.1rem);
+        margin: 0 0 1.5rem;
+      }
+      section {
+        background: var(--bg-2);
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        margin-bottom: 1rem;
+      }
+      h2 {
+        font-size: 1.05rem;
+        margin: 0 0 0.6rem;
+      }
+      p {
+        margin: 0.4rem 0;
+      }
+      .placeholder {
+        color: var(--primary);
+        font-weight: 700;
+      }
+      .note {
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="back" href="./">← Zurück zu Storymoji</a>
+      <h1>Impressum</h1>
+
+      <p class="note">
+        Hinweis: Eine Impressumspflicht nach § 5 TMG besteht in der Regel für
+        <em>geschäftsmäßige</em> Telemedien. Für ein rein privates,
+        nicht-kommerzielles Projekt ohne Werbung ist das rechtlich nicht immer
+        eindeutig – im Zweifel anwaltlich prüfen lassen. Diese Seite ist ein
+        Platzhalter, falls du dich für ein Impressum entscheidest.
+      </p>
+
+      <section>
+        <h2>Angaben gemäß § 5 TMG</h2>
+        <p><span class="placeholder">[Vor- und Nachname]</span></p>
+        <p><span class="placeholder">[Straße und Hausnummer]</span></p>
+        <p><span class="placeholder">[PLZ und Ort]</span></p>
+      </section>
+
+      <section>
+        <h2>Kontakt</h2>
+        <p>E-Mail: <span class="placeholder">[E-Mail-Adresse]</span></p>
+      </section>
+
+      <section>
+        <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+        <p><span class="placeholder">[Name und Anschrift wie oben]</span></p>
+      </section>
+
+      <p class="note">
+        Siehe auch die
+        <a href="./datenschutz.html">Datenschutzerklärung</a>.
+      </p>
+    </div>
+  </body>
+</html>

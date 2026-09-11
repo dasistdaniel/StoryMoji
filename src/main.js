@@ -547,6 +547,21 @@ function buildIdeaPanel() {
   );
 }
 
+/**
+ * Footer: attribution + a link to the (static, no-JS-required) privacy
+ * policy page. No cookies/tracking are used, but server logs and localStorage
+ * are covered there – see public/datenschutz.html.
+ */
+function buildFooter() {
+  return el("footer", { class: "footer" }, [
+    el("span", {}, [t("footer.madeWith")]),
+    el("span", { class: "footer__sep", "aria-hidden": "true" }, ["·"]),
+    el("a", { class: "footer__link", href: "./datenschutz.html" }, [
+      t("footer.privacy"),
+    ]),
+  ]);
+}
+
 // --- announcements (screen readers) --------------------------------
 
 let liveRegion;
@@ -577,7 +592,7 @@ function render() {
     el("main", { class: "stage" }, [buildGrid(), buildIdeaPanel()]),
     buildCountControl(),
     buildActions(),
-    el("footer", { class: "footer" }, [t("footer.madeWith")]),
+    buildFooter(),
     liveRegion
   );
 
