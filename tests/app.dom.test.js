@@ -244,7 +244,7 @@ describe("app boot", () => {
     );
     expect(enTerms).not.toEqual(deTerms);
     // brand name stays the same; the tagline is what changes
-    expect(app.querySelector(".brand__title").textContent).toBe("Storymoji");
+    expect(app.querySelector(".brand__title").textContent).toBe("StoryMoji");
     expect(app.querySelector(".tagline").textContent).toMatch(
       /make up a story/i
     );

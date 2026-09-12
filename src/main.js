@@ -1,4 +1,4 @@
-// Storymoji – app entry point.
+// StoryMoji – app entry point.
 //
 // Wires the pure logic modules (deck, i18n, prompts, sharing, sound) to the DOM.
 //

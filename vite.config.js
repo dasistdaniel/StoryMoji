@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 
-// Storymoji is a fully static site: `vite build` emits plain HTML/CSS/JS into
+// StoryMoji is a fully static site: `vite build` emits plain HTML/CSS/JS into
 // dist/ which can be served by any static host (nginx) without a backend.
 export default defineConfig({
   // Relative base so the build also works from a sub-path on the web server.

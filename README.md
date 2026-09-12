@@ -1,4 +1,4 @@
-# Storymoji 🎴
+# StoryMoji 🎴
 
 A colourful, kid-friendly web app for making up stories – a digital take on
 "Story Cubes". Draw 1–6 cards, each showing an emoji and its word, and invent a
@@ -102,9 +102,6 @@ docker compose up -d --build      # builds the site + serves it on :7044
   `80`, `restart: unless-stopped`, uses Docker's default bridge network.
 
 To update: re-run `docker compose up -d --build`.
-
-Current instance: `http://<lan-ip-redacted>:7044/` (container `storymoji`,
-project dir `/home/daniel/storymoji`).
 
 ## Roadmap
 

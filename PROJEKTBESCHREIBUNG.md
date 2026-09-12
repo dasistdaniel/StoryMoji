@@ -1,8 +1,8 @@
-# Storymoji – Projektbeschreibung
+# StoryMoji – Projektbeschreibung
 
 ## 1. Zusammenfassung
 
-Storymoji ist eine kindgerechte, farbenfrohe Web-App als digitale Variante von
+StoryMoji ist eine kindgerechte, farbenfrohe Web-App als digitale Variante von
 "Story Cubes". Der Nutzer zieht 1–6 Karten, jede Karte zeigt ein großes Emoji mit
 dem passenden Begriff darunter. Aus den gezogenen Karten denkt man sich gemeinsam
 eine Geschichte aus. Zusätzlich schlägt die App Spielideen vor
@@ -334,7 +334,7 @@ Standardwerte (3 Slots × "Alle Kategorien").
 ### 6.6 Projektstruktur (Vorschlag)
 
 ```
-storymoji/
+StoryMoji/
 ├─ public/
 │  ├─ manifest.webmanifest
 │  ├─ icons/                # PWA-Icons
