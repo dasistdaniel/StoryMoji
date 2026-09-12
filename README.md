@@ -109,3 +109,9 @@ Milestones and the "done" checklist are tracked in
 [`PROJEKTBESCHREIBUNG.md`](./PROJEKTBESCHREIBUNG.md) section 11. Next up: raster
 PNG app icons, a service worker for full offline play (v1.1), and expanding the
 card set.
+
+## License
+
+[MIT](./LICENSE) – see the `LICENSE` file. The card/prompt content in
+`src/data/` is original wordlists and emoji references; feel free to reuse the
+app itself under the same license.

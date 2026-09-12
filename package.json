@@ -4,6 +4,7 @@
   "description": "StoryMoji – a colourful, kid-friendly web app for drawing emoji story cards.",
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
