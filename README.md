@@ -5,7 +5,7 @@ A colourful, kid-friendly web app for making up stories – a digital take on
 story from them. The app also suggests play ideas
 ("Tell a superhero story using the things shown").
 
-Target deployment: <https://storymoji.nichtregistriert.de>
+🔗 Live: <https://storymoji.nichtregistriert.de>
 
 - **No backend, no database** – a fully static site (`dist/`) served by any web
   server (nginx).

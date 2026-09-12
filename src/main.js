@@ -559,6 +559,17 @@ function buildFooter() {
     el("a", { class: "footer__link", href: "./datenschutz.html" }, [
       t("footer.privacy"),
     ]),
+    el("span", { class: "footer__sep", "aria-hidden": "true" }, ["·"]),
+    el(
+      "a",
+      {
+        class: "footer__link",
+        href: "https://github.com/dasistdaniel/StoryMoji",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      [t("footer.github")],
+    ),
   ]);
 }
 
