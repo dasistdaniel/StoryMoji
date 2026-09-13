@@ -13,7 +13,8 @@
     { "id": "weather", "label": { "de": "Wetter", "en": "Weather" }, "color": "#48cae4" },
     { "id": "sport", "label": { "de": "Sport", "en": "Sport" }, "color": "#06d6a0" },
     { "id": "symbols", "label": { "de": "Symbole", "en": "Symbols" }, "color": "#ef476f" },
-    { "id": "numbers", "label": { "de": "Zahlen", "en": "Numbers" }, "color": "#ffc6ff" }
+    { "id": "numbers", "label": { "de": "Zahlen", "en": "Numbers" }, "color": "#ffc6ff" },
+    { "id": "letters", "label": { "de": "Buchstaben", "en": "Letters" }, "color": "#2ec4b6" }
   ],
   "cards": [
     { "id": "animals-dog", "category": "animals", "emoji": "🐶", "term": { "de": "Hund", "en": "Dog" } },
@@ -240,6 +241,33 @@
     { "id": "numbers-6", "category": "numbers", "emoji": "6️⃣", "term": { "de": "Sechs", "en": "Six" } },
     { "id": "numbers-7", "category": "numbers", "emoji": "7️⃣", "term": { "de": "Sieben", "en": "Seven" } },
     { "id": "numbers-8", "category": "numbers", "emoji": "8️⃣", "term": { "de": "Acht", "en": "Eight" } },
-    { "id": "numbers-9", "category": "numbers", "emoji": "9️⃣", "term": { "de": "Neun", "en": "Nine" } }
+    { "id": "numbers-9", "category": "numbers", "emoji": "9️⃣", "term": { "de": "Neun", "en": "Nine" } },
+
+    { "id": "letters-a", "category": "letters", "emoji": "🇦", "term": { "de": "A", "en": "A" } },
+    { "id": "letters-b", "category": "letters", "emoji": "🇧", "term": { "de": "B", "en": "B" } },
+    { "id": "letters-c", "category": "letters", "emoji": "🇨", "term": { "de": "C", "en": "C" } },
+    { "id": "letters-d", "category": "letters", "emoji": "🇩", "term": { "de": "D", "en": "D" } },
+    { "id": "letters-e", "category": "letters", "emoji": "🇪", "term": { "de": "E", "en": "E" } },
+    { "id": "letters-f", "category": "letters", "emoji": "🇫", "term": { "de": "F", "en": "F" } },
+    { "id": "letters-g", "category": "letters", "emoji": "🇬", "term": { "de": "G", "en": "G" } },
+    { "id": "letters-h", "category": "letters", "emoji": "🇭", "term": { "de": "H", "en": "H" } },
+    { "id": "letters-i", "category": "letters", "emoji": "🇮", "term": { "de": "I", "en": "I" } },
+    { "id": "letters-j", "category": "letters", "emoji": "🇯", "term": { "de": "J", "en": "J" } },
+    { "id": "letters-k", "category": "letters", "emoji": "🇰", "term": { "de": "K", "en": "K" } },
+    { "id": "letters-l", "category": "letters", "emoji": "🇱", "term": { "de": "L", "en": "L" } },
+    { "id": "letters-m", "category": "letters", "emoji": "🇲", "term": { "de": "M", "en": "M" } },
+    { "id": "letters-n", "category": "letters", "emoji": "🇳", "term": { "de": "N", "en": "N" } },
+    { "id": "letters-o", "category": "letters", "emoji": "🇴", "term": { "de": "O", "en": "O" } },
+    { "id": "letters-p", "category": "letters", "emoji": "🇵", "term": { "de": "P", "en": "P" } },
+    { "id": "letters-q", "category": "letters", "emoji": "🇶", "term": { "de": "Q", "en": "Q" } },
+    { "id": "letters-r", "category": "letters", "emoji": "🇷", "term": { "de": "R", "en": "R" } },
+    { "id": "letters-s", "category": "letters", "emoji": "🇸", "term": { "de": "S", "en": "S" } },
+    { "id": "letters-t", "category": "letters", "emoji": "🇹", "term": { "de": "T", "en": "T" } },
+    { "id": "letters-u", "category": "letters", "emoji": "🇺", "term": { "de": "U", "en": "U" } },
+    { "id": "letters-v", "category": "letters", "emoji": "🇻", "term": { "de": "V", "en": "V" } },
+    { "id": "letters-w", "category": "letters", "emoji": "🇼", "term": { "de": "W", "en": "W" } },
+    { "id": "letters-x", "category": "letters", "emoji": "🇽", "term": { "de": "X", "en": "X" } },
+    { "id": "letters-y", "category": "letters", "emoji": "🇾", "term": { "de": "Y", "en": "Y" } },
+    { "id": "letters-z", "category": "letters", "emoji": "🇿", "term": { "de": "Z", "en": "Z" } }
   ]
 }

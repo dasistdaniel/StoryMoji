@@ -355,6 +355,34 @@ body {
   line-height: 1;
 }
 
+.letter-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 22%;
+  background: var(--accent, var(--primary));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.letter-tile__glyph {
+  font-size: 0.55em;
+  font-weight: 800;
+  line-height: 1;
+  /* Fixed dark ink (not the theme's --ink, which flips light/dark) – the tile
+     background is the category's fixed accent colour in both themes, and this
+     keeps contrast readable against it either way. */
+  color: var(--primary-ink);
+}
+
+/* The tile already shows the letter; the term text below would just repeat
+   it, so hide it – kept in the DOM (not skipped in JS) so per-index lookups
+   (tests, any future code) still find one .card__term per card. */
+.card:has(.letter-tile) .card__term {
+  display: none;
+}
+
 .card__term {
   font-weight: 800;
   font-size: clamp(0.8rem, 10cqw, 1.35rem);

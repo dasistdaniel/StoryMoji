@@ -60,3 +60,16 @@ export function renderEmoji(emoji) {
     emoji,
   ]);
 }
+
+/**
+ * A colourful letter tile for the "letters" category.
+ *
+ * Lone regional-indicator symbols (used as A-Z card emoji, e.g. "🇳") render as
+ * a plain, uncoloured glyph on several platforms/fonts instead of a keycap-like
+ * tile, so this builds the same visual with CSS instead of relying on the glyph.
+ */
+export function renderLetterTile(letter) {
+  return el("span", { class: "emoji letter-tile", role: "img", "aria-hidden": "true" }, [
+    el("span", { class: "letter-tile__glyph" }, [letter]),
+  ]);
+}

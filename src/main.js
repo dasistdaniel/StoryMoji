@@ -31,7 +31,7 @@ import {
 import { randomPrompt, renderPrompt } from "./prompts.js";
 import { readDrawFromUrl, writeDrawToUrl, copyCurrentLink } from "./sharing.js";
 import * as sound from "./sound.js";
-import { el, clear, renderEmoji } from "./ui/dom.js";
+import { el, clear, renderEmoji, renderLetterTile } from "./ui/dom.js";
 
 const CARDS = cardData.cards;
 const CATEGORIES = cardData.categories;
@@ -310,6 +310,7 @@ function buildCard(slot, index) {
   const covered = isCovered(slot);
   const term = card ? card.term[lang] || card.term.de : "…";
   const n = String(index + 1);
+  const isLetterCard = card && card.category === "letters";
 
   const select = el(
     "select",
@@ -354,7 +355,9 @@ function buildCard(slot, index) {
     covered
       ? [el("span", { class: "card__back", "aria-hidden": "true" }, ["?"])]
       : [
-          renderEmoji(card ? card.emoji : "❓"),
+          isLetterCard
+            ? renderLetterTile(term)
+            : renderEmoji(card ? card.emoji : "❓"),
           el("span", { class: "card__term" }, [term]),
         ]
   );

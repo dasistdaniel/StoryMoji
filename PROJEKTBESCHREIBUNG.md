@@ -444,7 +444,8 @@ SSH nach `dist/` auf den Server. Alternativ komplett manuell.
 
 ## 9. Inhaltsumfang v1
 
-- Ca. 13 Kategorien (davon "Zahlen" mit fester 10er-Menge 0–9).
+- Ca. 14 Kategorien (davon "Zahlen" mit fester 10er-Menge 0–9 und
+  "Buchstaben" mit fester 26er-Menge A–Z).
 - Mindestens 15 Karten pro Kategorie (Ziel: 20–30), also ~200–350 Karten gesamt.
 - Mindestens 15 Spielideen.
 - Vollständige DE- und EN-Übersetzung aller Karten, Ideen und UI-Texte.
@@ -514,7 +515,7 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
    `prefers-reduced-motion` stehen. Lighthouse-Durchgang gemacht (Performance
    98, Accessibility 96, SEO 91 – Kontrastfehler beim Primary-Button und
    fehlende robots.txt/llms.txt behoben). Offen: eigene Schriftart einbinden.
-7. 🟡 **M7 – Inhalte:** 13 Kategorien, ~213 Karten, 18 Spielideen (DE + EN)
+7. 🟡 **M7 – Inhalte:** 14 Kategorien, 239 Karten, 18 Spielideen (DE + EN)
    vorhanden. Ziel: auf 20–30 Karten je Kategorie ausbauen, Ideen erweitern.
 8. ✅ **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` mit SVG- und
    gerasterten PNG-Icons (192/512, Apple-Touch-Icon), `deploy/nginx.conf`,
