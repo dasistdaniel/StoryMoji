@@ -511,15 +511,18 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
 5. ✅ **M5 – Teilen & Sound:** Ziehung im URL-Hash serialisieren, "Ziehung
    teilen"-Button (Clipboard/`navigator.share`); Soundeffekte + opt-in-Toggle.
 6. 🟡 **M6 – Design-Feinschliff:** Farbschema, Animationen, Dark Mode und
-   `prefers-reduced-motion` stehen. Offen: eigene Schriftart einbinden,
-   Feinschliff, formaler Accessibility-Durchgang / Lighthouse.
+   `prefers-reduced-motion` stehen. Lighthouse-Durchgang gemacht (Performance
+   98, Accessibility 96, SEO 91 – Kontrastfehler beim Primary-Button und
+   fehlende robots.txt/llms.txt behoben). Offen: eigene Schriftart einbinden.
 7. 🟡 **M7 – Inhalte:** 13 Kategorien, ~213 Karten, 18 Spielideen (DE + EN)
    vorhanden. Ziel: auf 20–30 Karten je Kategorie ausbauen, Ideen erweitern.
-8. 🟡 **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` + SVG-Icons und
-   `deploy/nginx.conf` stehen. Offen: gerasterte PNG-Icons (192/512),
-   optionale CI. Danach **Release v1.0.**
-9. ⬜ **M9 – Offline (v1.1):** Service Worker (Precache aller App-Assets +
-   Daten), Update-Handling ("Neue Version verfügbar"), Offline-Test.
+8. ✅ **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` mit SVG- und
+   gerasterten PNG-Icons (192/512, Apple-Touch-Icon), `deploy/nginx.conf`,
+   GitHub Actions CI stehen. **Release v1.0.**
+9. 🟡 **M9 – Offline (v1.1):** Service Worker mit Laufzeit-Caching des
+   App-Shells steht und ist live. Offen: Update-Handling ("Neue Version
+   verfügbar"-Hinweis bei neuem Deploy) und ein manueller Offline-Test im
+   Browser (Flugmodus / DevTools "Offline").
 
 ## 12. Ausblick (nach v1.1)
 
