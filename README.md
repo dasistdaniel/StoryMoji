@@ -10,8 +10,9 @@ story from them. The app also suggests play ideas
 - **No backend, no database** – a fully static site (`dist/`) served by any web
   server (nginx).
 - **Bilingual** – German (primary) and English, switchable without a reload.
-- **Offline-friendly** – installable via a web app manifest (full offline
-  support planned for v1.1).
+- **Offline-friendly** – installable via a web app manifest, with a service
+  worker caching the app shell so it keeps working without a network
+  connection after the first visit.
 - **Private / GDPR-friendly** – no cookies, no tracking, no third-party
   requests; only `localStorage` for settings; access logs are IP-anonymised.
   See [`public/datenschutz.html`](./public/datenschutz.html) (privacy policy –
@@ -106,9 +107,8 @@ To update: re-run `docker compose up -d --build`.
 ## Roadmap
 
 Milestones and the "done" checklist are tracked in
-[`PROJEKTBESCHREIBUNG.md`](./PROJEKTBESCHREIBUNG.md) section 11. Next up: raster
-PNG app icons, a service worker for full offline play (v1.1), and expanding the
-card set.
+[`PROJEKTBESCHREIBUNG.md`](./PROJEKTBESCHREIBUNG.md) section 11. Next up:
+expanding the card set.
 
 ## License
 

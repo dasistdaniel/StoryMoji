@@ -631,3 +631,10 @@ store.subscribe(() => render());
 
 render();
 syncUrl();
+
+// Offline app-shell caching; safe no-op where the API doesn't exist (e.g. jsdom in tests).
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}
