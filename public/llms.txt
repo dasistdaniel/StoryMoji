@@ -1,0 +1,15 @@
+# StoryMoji
+
+> A colourful, kid-friendly web app for making up stories – a digital take on
+> Story Cubes. Draw 1-6 cards, each showing an emoji and its word, and invent
+> a story from them.
+
+No backend, no accounts, no cookies or tracking. Bilingual (German/English).
+All state (language, sound, current draw) lives in the URL hash or the
+browser's local storage.
+
+## Docs
+
+- [Live app](https://storymoji.nichtregistriert.de): the app itself
+- [Source code](https://github.com/dasistdaniel/StoryMoji): full source, MIT licensed
+- [Privacy policy](https://storymoji.nichtregistriert.de/datenschutz.html): data handling (German, GDPR)
