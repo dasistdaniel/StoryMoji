@@ -515,8 +515,9 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
    `prefers-reduced-motion` stehen. Lighthouse-Durchgang gemacht (Performance
    98, Accessibility 96, SEO 91 – Kontrastfehler beim Primary-Button und
    fehlende robots.txt/llms.txt behoben). Offen: eigene Schriftart einbinden.
-7. 🟡 **M7 – Inhalte:** 14 Kategorien, 239 Karten, 18 Spielideen (DE + EN)
-   vorhanden. Ziel: auf 20–30 Karten je Kategorie ausbauen, Ideen erweitern.
+7. 🟡 **M7 – Inhalte:** 14 Kategorien, 270 Karten, 18 Spielideen (DE + EN)
+   vorhanden; die meisten Kategorien liegen bei 18–22 Karten. Ziel: auf
+   20–30 Karten je Kategorie ausbauen, Ideen erweitern.
 8. ✅ **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` mit SVG- und
    gerasterten PNG-Icons (192/512, Apple-Touch-Icon), `deploy/nginx.conf`,
    GitHub Actions CI stehen. **Release v1.0.**
