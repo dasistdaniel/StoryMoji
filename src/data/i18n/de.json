@@ -35,6 +35,9 @@
   "footer.privacy": "Datenschutz",
   "footer.github": "Quellcode",
 
+  "update.available": "Neue Version verfügbar.",
+  "update.reload": "Neu laden",
+
   "lang.de": "Deutsch",
   "lang.en": "Englisch"
 }

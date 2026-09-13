@@ -636,6 +636,40 @@ body {
   color: var(--primary);
 }
 
+/* --- update banner ------------------------------------------------ */
+
+.update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.6rem 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow);
+  font-weight: 700;
+  font-size: 0.9rem;
+  max-width: calc(100vw - 2rem);
+}
+
+.update-banner__reload {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
 /* --- a11y utilities -------------------------------------------- */
 
 :focus-visible {

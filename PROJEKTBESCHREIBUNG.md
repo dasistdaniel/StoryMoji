@@ -519,10 +519,12 @@ Legende: ✅ erledigt · 🟡 teilweise · ⬜ offen
 8. ✅ **M8 – PWA-Manifest & Deployment:** `manifest.webmanifest` mit SVG- und
    gerasterten PNG-Icons (192/512, Apple-Touch-Icon), `deploy/nginx.conf`,
    GitHub Actions CI stehen. **Release v1.0.**
-9. 🟡 **M9 – Offline (v1.1):** Service Worker mit Laufzeit-Caching des
-   App-Shells steht und ist live. Offen: Update-Handling ("Neue Version
-   verfügbar"-Hinweis bei neuem Deploy) und ein manueller Offline-Test im
-   Browser (Flugmodus / DevTools "Offline").
+9. ✅ **M9 – Offline (v1.1):** Service Worker mit Laufzeit-Caching des
+   App-Shells, Update-Handling ("Neue Version verfügbar"-Hinweis mit
+   Neu-laden-Button bei neuem Deploy). Offline-Test per Chrome-DevTools-Protokoll
+   (Netzwerk auch für den Service-Worker-Prozess auf offline gesetzt, HTTP-Cache
+   geleert) bestanden: App-Shell lädt vollständig aus dem Cache, eine nicht
+   gecachte URL schlägt wie erwartet fehl.
 
 ## 12. Ausblick (nach v1.1)
 

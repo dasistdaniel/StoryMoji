@@ -573,6 +573,27 @@ function buildFooter() {
   ]);
 }
 
+// --- service worker update notice -----------------------------------
+
+/** Shows a dismissable "new version available" bar; reload picks it up. */
+function showUpdateBanner() {
+  if (document.querySelector(".update-banner")) return;
+  document.body.append(
+    el("div", { class: "update-banner", role: "status" }, [
+      el("span", {}, [t("update.available")]),
+      el(
+        "button",
+        {
+          class: "update-banner__reload",
+          type: "button",
+          onclick: () => window.location.reload(),
+        },
+        [t("update.reload")],
+      ),
+    ]),
+  );
+}
+
 // --- announcements (screen readers) --------------------------------
 
 let liveRegion;
@@ -635,6 +656,23 @@ syncUrl();
 // Offline app-shell caching; safe no-op where the API doesn't exist (e.g. jsdom in tests).
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js");
+    navigator.serviceWorker.register("./sw.js").then((registration) => {
+      // A worker installing while one is already controlling the page is an
+      // update (not the first-ever install) – offer a reload to pick it up.
+      registration.addEventListener("updatefound", () => {
+        const installing = registration.installing;
+        if (!installing) return;
+        installing.addEventListener("statechange", () => {
+          if (installing.state === "installed" && navigator.serviceWorker.controller) {
+            showUpdateBanner();
+          }
+        });
+      });
+      // Browsers already check for updates on navigation; also check when
+      // an already-open tab (e.g. an installed PWA) regains focus.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") registration.update();
+      });
+    });
   });
 }
